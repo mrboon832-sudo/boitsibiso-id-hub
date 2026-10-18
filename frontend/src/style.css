@@ -1,0 +1,406 @@
+/* Boitsibiso National ID Hub — Government Design System
+   Simple, clean, accessible. Works for low-literacy and assistive contexts. */
+
+:root {
+  --color-primary: #0b5d3b;       /* trust / gov green */
+  --color-primary-dark: #073e27;
+  --color-primary-light: #e6f3ec;
+  --color-accent: #b3241c;        /* flagged / attention (used sparingly) */
+  --color-accent-bg: #fbe8e6;
+  --color-amber: #a15c00;
+  --color-amber-bg: #fdf1dc;
+  --color-text: #1c1f1e;
+  --color-text-muted: #565b59;
+  --color-bg: #f5f7f6;
+  --color-surface: #ffffff;
+  --color-border: #d8dedb;
+  --radius: 10px;
+  --font-size-label: 0.85rem;
+  --font-size-body: 1rem;
+  --font-size-heading: 1.5rem;
+  --font-family: 'Segoe UI', Arial, system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #app {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  color: var(--color-text);
+  background: var(--color-bg);
+  line-height: 1.5;
+}
+
+body.large-text {
+  font-size: 1.25rem;
+}
+body.large-text .btn { font-size: 1.1rem; padding: 0.85rem 1.4rem; }
+body.large-text input, body.large-text select { font-size: 1.15rem; }
+
+h1, h2, h3 {
+  color: var(--color-primary-dark);
+  margin-top: 0;
+}
+h1 { font-size: 1.6rem; }
+h2 { font-size: var(--font-size-heading); }
+h3 { font-size: 1.15rem; }
+
+a { color: var(--color-primary); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-primary);
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn:hover { background: var(--color-primary-dark); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn.secondary {
+  background: transparent;
+  color: var(--color-primary);
+}
+.btn.secondary:hover { background: var(--color-primary-light); }
+.btn.danger {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+.btn.danger:hover { background: #8f1b15; }
+.btn.block { width: 100%; }
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.field {
+  margin-bottom: 1rem;
+}
+.field label {
+  display: block;
+  font-size: var(--font-size-label);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: 0.3rem;
+}
+.field input, .field select, .field textarea {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-family: inherit;
+  background: #fff;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+.alert.error { background: var(--color-accent-bg); color: var(--color-accent); border: 1px solid var(--color-accent); }
+.alert.info { background: var(--color-primary-light); color: var(--color-primary-dark); border: 1px solid var(--color-primary); }
+
+/* Status chips — reused everywhere so patterns are instantly recognisable */
+.chip {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+.chip.pending { background: var(--color-amber-bg); color: var(--color-amber); }
+.chip.in_review { background: var(--color-amber-bg); color: var(--color-amber); }
+.chip.confirmed { background: var(--color-primary-light); color: var(--color-primary-dark); }
+.chip.completed { background: var(--color-primary-light); color: var(--color-primary-dark); }
+.chip.actioned { background: var(--color-primary-light); color: var(--color-primary-dark); }
+.chip.notified { background: #e5edfb; color: #1d4b91; }
+.chip.rejected { background: var(--color-accent-bg); color: var(--color-accent); }
+.chip.flagged { background: var(--color-accent-bg); color: var(--color-accent); }
+.chip.active { background: var(--color-primary-light); color: var(--color-primary-dark); }
+.chip.deceased { background: #eee; color: #555; }
+
+/* Audit / log entry — repeating component used across several screens */
+.log-entry {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.92rem;
+}
+.log-entry:last-child { border-bottom: none; }
+.log-entry .log-who { font-weight: 600; }
+.log-entry .log-when { color: var(--color-text-muted); font-size: 0.82rem; white-space: nowrap; }
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-primary);
+  color: #fff;
+  padding: 0.85rem 1.25rem;
+}
+.topbar .brand { font-weight: 700; font-size: 1.1rem; color: #fff; text-decoration: none; }
+.topbar nav { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.topbar nav a, .topbar button.link {
+  color: #fff;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: var(--radius);
+  padding: 0.4rem 0.75rem;
+  font-size: 0.88rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+.topbar nav a.router-link-active, .topbar nav a:hover, .topbar button.link:hover {
+  background: rgba(255,255,255,0.18);
+}
+
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.muted { color: var(--color-text-muted); }
+.text-center { text-align: center; }
+.mt-1 { margin-top: 1rem; }
+.mb-0 { margin-bottom: 0; }
+
+.ussd-screen {
+  background: #0d1a10;
+  color: #c9f7d2;
+  font-family: 'Consolas', monospace;
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  white-space: pre-wrap;
+  min-height: 220px;
+  font-size: 1rem;
+}
+
+.profile-select {
+  background: #fff;
+  color: var(--color-primary-dark);
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: var(--radius);
+  padding: 0.4rem 0.5rem;
+  font-size: 0.88rem;
+  min-width: 220px;
+}
+
+.screen-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.75rem;
+}
+.screen-links a {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.75rem;
+  text-decoration: none;
+  font-weight: 600;
+}
+.screen-links a:hover { background: var(--color-primary-light); }
+
+.phone-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  gap: 1rem;
+  padding: 2rem;
+  background: radial-gradient(circle at center, #26342c 0, #101512 65%);
+}
+
+.phone-shell {
+  width: min(360px, 100%);
+  background: #1a1c1b;
+  border: 8px solid #080909;
+  border-radius: 34px;
+  box-shadow: 0 30px 70px rgba(0,0,0,0.45);
+  padding: 1rem 0.8rem;
+}
+.phone-speaker {
+  width: 64px;
+  height: 7px;
+  border-radius: 999px;
+  background: #3d403f;
+  margin: 0 auto 0.8rem;
+}
+.phone-screen {
+  background: #071009;
+  color: #b8f4bd;
+  border-radius: 14px;
+  overflow: hidden;
+  font-family: 'Consolas', 'Courier New', monospace;
+  border: 1px solid #2d4d31;
+}
+.phone-statusbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0.6rem;
+  background: #0c2010;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+}
+.phone-terminal {
+  min-height: 310px;
+  max-height: 430px;
+  overflow-y: auto;
+  padding: 1rem;
+  white-space: pre-wrap;
+  line-height: 1.45;
+}
+.terminal-line {
+  margin-bottom: 0.65rem;
+}
+.terminal-line.input {
+  color: #f6f1a6;
+  margin-bottom: 0.35rem;
+}
+.phone-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-top: 1px solid #2d4d31;
+  padding: 0.65rem;
+}
+.phone-input-row input {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  color: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  outline: none;
+}
+.phone-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.55rem;
+  margin-top: 0.9rem;
+}
+.phone-key {
+  min-height: 48px;
+  border: 0;
+  border-radius: 12px;
+  background: #303433;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.phone-key.call {
+  background: #1f7a43;
+}
+.phone-key.end {
+  background: #8c2a2a;
+}
+.phone-dial-display {
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 1rem;
+  text-align: center;
+}
+.dial-number {
+  font-size: 1.9rem;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  min-height: 2.2rem;
+}
+.dial-hint {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #9fd7a8;
+}
+.dial-hint.error {
+  color: #f6a3a3;
+}
+.dialer-keypad {
+  grid-template-columns: repeat(3, 1fr);
+}
+.dial-digit {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  line-height: 1.1;
+}
+.dial-digit .digit {
+  font-size: 1.1rem;
+}
+.dial-digit .letters {
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: #9aa39b;
+}
+.phone-home-link {
+  display: block;
+  text-align: center;
+  margin-top: 0.9rem;
+  color: #9fd7a8;
+  font-size: 0.82rem;
+  text-decoration: none;
+}
+.phone-help {
+  max-width: 360px;
+  color: #d7e2d9;
+  text-align: center;
+  margin: 0;
+}
+
+table.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+table.data-table th, table.data-table td {
+  text-align: left;
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.92rem;
+}
+table.data-table th { color: var(--color-text-muted); font-weight: 600; }
+
+.skip-link:focus {
+  position: fixed;
+  top: 0; left: 0;
+  background: #fff;
+  padding: 0.5rem 1rem;
+  z-index: 1000;
+}
