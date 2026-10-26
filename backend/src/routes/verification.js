@@ -7,6 +7,12 @@ const { asyncHandler } = require('../middleware/asyncHandler');
 
 const router = express.Router();
 
+function parseJson(value) {
+  if (!value) return null;
+  if (typeof value === 'object') return value;
+  return JSON.parse(value);
+}
+
 function toView(v) {
   return {
     id: v.id,
@@ -15,7 +21,7 @@ function toView(v) {
     nationalId: v.national_id,
     purpose: v.purpose,
     status: v.status,
-    dataShared: v.data_shared ? JSON.parse(v.data_shared) : null,
+    dataShared: parseJson(v.data_shared),
     requestedAt: v.requested_at,
     respondedAt: v.responded_at,
   };

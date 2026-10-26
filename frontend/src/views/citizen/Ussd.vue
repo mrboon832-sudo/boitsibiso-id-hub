@@ -1,6 +1,7 @@
 <script setup>
 import { ref, nextTick } from 'vue';
 import axios from 'axios';
+import { getApiErrorMessage } from '../../api/client';
 
 const api = axios.create({ baseURL: 'http://localhost:4000/api' });
 
@@ -74,6 +75,8 @@ async function send(value = input.value) {
     appendScreen(data.text.replace(/^(CON|END) /, ''));
     ended.value = !!data.ended;
     input.value = '';
+  } catch (e) {
+    appendScreen(`ERROR: ${getApiErrorMessage(e, 'USSD request failed.')}`);
   } finally {
     loading.value = false;
   }

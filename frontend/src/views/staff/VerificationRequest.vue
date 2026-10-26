@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import api from '../../api/client';
+import api, { getApiErrorMessage } from '../../api/client';
 import { useDemoStore } from '../../store/demo';
 
 const demo = useDemoStore();
@@ -17,7 +17,7 @@ async function loadHistory() {
     const { data } = await api.get('/verification-requests');
     history.value = data.requests;
   } catch (err) {
-    error.value = 'Select Traffic, Pensions, Finance, or Administrator in the toolbar to load this screen.';
+    error.value = getApiErrorMessage(err, 'Could not load verification history.');
   }
 }
 onMounted(loadHistory);

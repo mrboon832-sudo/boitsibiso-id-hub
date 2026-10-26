@@ -80,6 +80,11 @@ export const useDemoStore = defineStore('demo', {
     setActiveProfile(key) {
       this.activeProfileKey = DEMO_PROFILES[key] ? key : 'thabo';
       this.backendReady = false;
+      // A demo profile change is an authentication change. Do not let the
+      // next request reuse the previous persona's token or user snapshot.
+      localStorage.removeItem('boitsibiso_token');
+      localStorage.removeItem('boitsibiso_user');
+      localStorage.removeItem('boitsibiso_token_profile');
       localStorage.setItem('boitsibiso_demo_profile', this.activeProfileKey);
     },
   },

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import api from '../../api/client';
+import api, { getApiErrorMessage } from '../../api/client';
 import { useDemoStore } from '../../store/demo';
 
 const demo = useDemoStore();
@@ -16,7 +16,7 @@ async function load() {
     const { data } = await api.get('/applications');
     applications.value = data.applications;
   } catch (err) {
-    error.value = 'Select Home Affairs or Administrator in the toolbar to load this screen.';
+    error.value = getApiErrorMessage(err, 'Could not load applications.');
   } finally {
     loading.value = false;
   }

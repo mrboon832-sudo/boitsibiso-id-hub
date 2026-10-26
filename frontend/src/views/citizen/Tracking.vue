@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import api from '../../api/client';
+import api, { getApiErrorMessage } from '../../api/client';
 import { useDemoStore } from '../../store/demo';
 
 const demo = useDemoStore();
@@ -20,7 +20,7 @@ async function load() {
     applications.value = appsRes.data.applications;
     shareFeed.value = feedRes.data.entries;
   } catch (err) {
-    error.value = 'Select a citizen demo account in the toolbar to load this screen.';
+    error.value = getApiErrorMessage(err, 'Could not load your application history.');
   } finally {
     loading.value = false;
   }

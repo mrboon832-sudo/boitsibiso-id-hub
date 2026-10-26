@@ -1,9 +1,11 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import api from '../../api/client';
+import api, { getApiErrorMessage } from '../../api/client';
+import { useDemoStore } from '../../store/demo';
 
 const route = useRoute();
+const demo = useDemoStore();
 const citizen = ref(null);
 const accessLog = ref([]);
 const loading = ref(true);
@@ -32,7 +34,7 @@ async function load() {
       deceasedDate: citizen.value.deceasedDate || '',
     };
   } catch (err) {
-    error.value = err.response?.data?.error || 'Could not load citizen record.';
+    error.value = getApiErrorMessage(err, 'Could not load citizen record.');
   } finally {
     loading.value = false;
   }
@@ -40,6 +42,7 @@ async function load() {
 
 onMounted(load);
 watch(() => route.params.nationalId, load);
+watch(() => demo.activeProfileKey, load);
 
 async function save() {
   saving.value = true;
@@ -50,7 +53,7 @@ async function save() {
     success.value = 'Record updated.';
     await load();
   } catch (err) {
-    error.value = err.response?.data?.error || 'Could not save changes.';
+    error.value = getApiErrorMessage(err, 'Could not save changes.');
   } finally {
     saving.value = false;
   }

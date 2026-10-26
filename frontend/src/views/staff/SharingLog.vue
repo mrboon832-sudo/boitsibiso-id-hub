@@ -1,7 +1,9 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import api from '../../api/client';
+import { ref, onMounted, watch } from 'vue';
+import api, { getApiErrorMessage } from '../../api/client';
+import { useDemoStore } from '../../store/demo';
 
+const demo = useDemoStore();
 const nationalId = ref('9804125012345');
 const entries = ref([]);
 const loading = ref(false);
@@ -18,13 +20,14 @@ async function load() {
     });
     entries.value = data.entries;
   } catch (err) {
-    error.value = 'Select a staff demo account in the toolbar to load the sharing log.';
+    error.value = getApiErrorMessage(err, 'Could not load the sharing log.');
   } finally {
     loading.value = false;
   }
 }
 
 onMounted(load);
+watch(() => demo.activeProfileKey, load);
 </script>
 
 <template>

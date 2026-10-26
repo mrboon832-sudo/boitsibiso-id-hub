@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import api from '../../api/client';
+import api, { getApiErrorMessage } from '../../api/client';
 import { useDemoStore } from '../../store/demo';
 
 const demo = useDemoStore();
@@ -28,7 +28,7 @@ async function load() {
     const { data } = await api.get('/applications');
     queue.value = data.applications;
   } catch (err) {
-    error.value = 'Select a staff demo account in the toolbar to load this screen.';
+    error.value = getApiErrorMessage(err, 'Could not load the staff queue.');
   }
 
   try {
@@ -36,7 +36,7 @@ async function load() {
     notifications.value = data.notifications;
   } catch (err) {
     notifications.value = [];
-    notificationsNotice.value = 'This department does not receive push notifications in the demo rules.';
+    notificationsNotice.value = getApiErrorMessage(err, 'This department does not receive push notifications in the demo rules.');
   } finally {
     loading.value = false;
   }

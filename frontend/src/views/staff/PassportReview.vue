@@ -1,7 +1,9 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import api from '../../api/client';
+import { ref, onMounted, watch } from 'vue';
+import api, { getApiErrorMessage } from '../../api/client';
+import { useDemoStore } from '../../store/demo';
 
+const demo = useDemoStore();
 const nationalId = ref('9207157012347');
 const citizen = ref(null);
 const flag = ref(undefined); // undefined = not checked yet, null = no flag, object = flag exists
@@ -11,6 +13,7 @@ const requesting = ref(false);
 const requestSent = ref(false);
 
 onMounted(() => lookup());
+watch(() => demo.activeProfileKey, lookup);
 
 async function lookup() {
   error.value = '';
@@ -29,7 +32,7 @@ async function lookup() {
     const flagRes = await api.get(`/police-flags/${nationalId.value.trim()}`);
     flag.value = flagRes.data.flag;
   } catch (err) {
-    error.value = err.response?.data?.error || 'Could not retrieve applicant details.';
+    error.value = getApiErrorMessage(err, 'Could not retrieve applicant details.');
   } finally {
     loading.value = false;
   }

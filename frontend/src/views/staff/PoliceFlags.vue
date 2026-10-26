@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import api from '../../api/client';
+import api, { getApiErrorMessage } from '../../api/client';
 import { useDemoStore } from '../../store/demo';
 
 const demo = useDemoStore();
@@ -20,7 +20,7 @@ async function loadRequests() {
     const { data } = await api.get('/police-flags/requests/list');
     requests.value = data.requests;
   } catch (err) {
-    error.value = 'Select Police or Administrator in the toolbar to load this screen.';
+    error.value = getApiErrorMessage(err, 'Could not load police flag requests.');
   }
 }
 onMounted(loadRequests);
