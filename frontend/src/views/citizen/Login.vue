@@ -32,7 +32,7 @@ async function submit() {
 
     <div class="card mt-1">
       <h2>Sign in</h2>
-      <div class="alert error" v-if="error">{{ error }}</div>
+      <div class="alert error" role="alert" v-if="error">{{ error }}</div>
       <form @submit.prevent="submit">
         <div class="field">
           <label for="username">National ID / Staff username</label>

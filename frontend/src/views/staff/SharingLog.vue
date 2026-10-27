@@ -34,7 +34,7 @@ watch(() => demo.activeProfileKey, load);
   <div class="page">
     <h1>Notification Rules & Sharing Log</h1>
     <p class="muted">Every pull request and push notification across departments is logged here — the central proof of traceability.</p>
-    <div class="alert error" v-if="error">{{ error }}</div>
+    <div class="alert error" role="alert" v-if="error">{{ error }}</div>
 
     <div class="card">
       <div class="field" style="max-width: 320px;">

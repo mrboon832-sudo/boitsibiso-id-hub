@@ -51,7 +51,7 @@ async function requestVerification() {
     <h1>Department Verification Request</h1>
     <p class="muted">Pull Core Identity Data from Home Affairs instead of asking the citizen for a certified copy. Demo account: {{ demo.activeProfile.label }}.</p>
 
-    <div class="alert error" v-if="error">{{ error }}</div>
+    <div class="alert error" role="alert" v-if="error">{{ error }}</div>
 
     <div class="card">
       <div class="field"><label>Citizen National ID</label><input v-model="nationalId" placeholder="e.g. 195501011000" /></div>

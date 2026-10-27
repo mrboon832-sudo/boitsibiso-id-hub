@@ -75,8 +75,8 @@ async function respond(reqId, status) {
     <h1>Add / View Flag (Police)</h1>
     <p class="muted">Police control disclosure — other departments only ever see whether a flag exists, never the case details.</p>
 
-    <div class="alert error" v-if="error">{{ error }}</div>
-    <div class="alert info" v-if="success">{{ success }}</div>
+    <div class="alert error" role="alert" v-if="error">{{ error }}</div>
+    <div class="alert info" role="status" aria-live="polite" v-if="success">{{ success }}</div>
 
     <div class="card">
       <div class="field"><label>Citizen National ID</label><input v-model="nationalId" placeholder="e.g. 196104041003" /></div>

@@ -37,7 +37,7 @@ watch(() => demo.activeProfileKey, load);
   <div class="page">
     <h1>Welcome, {{ citizen?.fullName || demo.activeProfile.label }}</h1>
     <p class="muted" v-if="loading">Loading your profile…</p>
-    <div class="alert error" v-if="error">{{ error }}</div>
+    <div class="alert error" role="alert" v-if="error">{{ error }}</div>
 
     <div class="grid-2" v-if="citizen">
       <div class="card">

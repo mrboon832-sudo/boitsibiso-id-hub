@@ -54,7 +54,7 @@ async function requestPoliceCheck() {
     <h1>Passport Applicant Review</h1>
     <p class="muted">Core Identity Data is pulled automatically from Home Affairs; if Police has already shared a flag it appears here immediately.</p>
 
-    <div class="alert error" v-if="error">{{ error }}</div>
+    <div class="alert error" role="alert" v-if="error">{{ error }}</div>
 
     <div class="card">
       <div class="field"><label>Applicant National ID</label><input v-model="nationalId" placeholder="e.g. 196104041003" /></div>

@@ -64,7 +64,7 @@ async function save() {
   <div class="page">
     <h1>Citizen Profile Management</h1>
     <p class="muted" v-if="loading">Loading…</p>
-    <div class="alert error" v-if="error">{{ error }}</div>
+    <div class="alert error" role="alert" v-if="error">{{ error }}</div>
 
     <template v-if="citizen">
       <div class="grid-2">
@@ -72,7 +72,7 @@ async function save() {
           <h2>Core Identity & Civil Status Data</h2>
           <p><strong>{{ citizen.fullName }}</strong> — {{ citizen.nationalId }}</p>
           <p class="muted">DOB {{ citizen.dob }} · {{ citizen.gender }} · {{ citizen.district }}</p>
-          <div class="alert info" v-if="success">{{ success }}</div>
+          <div class="alert info" role="status" aria-live="polite" v-if="success">{{ success }}</div>
 
           <div class="field"><label>Address</label><input v-model="form.address" /></div>
           <div class="field"><label>District</label><input v-model="form.district" /></div>

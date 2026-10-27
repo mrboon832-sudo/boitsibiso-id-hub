@@ -46,12 +46,12 @@ async function submit() {
     <h1>Request a Service</h1>
     <p class="muted">One form covers ID renewal, licenses, pensions, passports and death registration — Home Affairs' Core Identity Data means you won't need to resubmit a certified copy.</p>
 
-    <div class="alert info" v-if="success">
+    <div class="alert info" role="status" aria-live="polite" v-if="success">
       Request submitted: <strong>{{ success.serviceType.replace(/_/g, ' ') }}</strong> ({{ success.department.replace('_', ' ') }}) — status
       <span class="chip" :class="success.status">{{ success.status }}</span>.
       <router-link to="/citizen/tracking">Track it here.</router-link>
     </div>
-    <div class="alert error" v-if="error">{{ error }}</div>
+    <div class="alert error" role="alert" v-if="error">{{ error }}</div>
 
     <div class="card">
       <form @submit.prevent="submit">

@@ -42,7 +42,7 @@ async function updateStatus(app, status) {
     <p class="muted">Confirm identity, process the request, and move it forward. Death registrations automatically notify Pensions. Demo account: {{ demo.activeProfile.label }}.</p>
 
     <p class="muted" v-if="loading">Loading…</p>
-    <div class="alert error" v-if="error">{{ error }}</div>
+    <div class="alert error" role="alert" v-if="error">{{ error }}</div>
     <div class="card" v-if="!loading && !error">
       <table class="data-table" v-if="applications.length">
         <thead>

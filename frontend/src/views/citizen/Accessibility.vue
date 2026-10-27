@@ -1,17 +1,22 @@
 <script setup>
-import { ref, watchEffect } from 'vue';
+import { ref } from 'vue';
+import { useI18n } from '../../i18n';
+import api from '../../api/client';
 
-const language = ref(localStorage.getItem('boitsibiso_demo_language') || 'en');
-const largeText = ref(localStorage.getItem('boitsibiso_demo_large_text') === '1');
+const { t, accessibility } = useI18n();
 const saved = ref(false);
 
-watchEffect(() => {
-  document.body.classList.toggle('large-text', largeText.value);
-});
-
-function save() {
-  localStorage.setItem('boitsibiso_demo_language', language.value);
-  localStorage.setItem('boitsibiso_demo_large_text', largeText.value ? '1' : '0');
+async function save() {
+  accessibility.save();
+  try {
+    await api.put('/auth/preferences', {
+      language: accessibility.language,
+      largeText: accessibility.largeText,
+    });
+  } catch {
+    // Local preferences remain usable when the API is temporarily offline.
+  }
+  accessibility.announce(t('saved'));
   saved.value = true;
   setTimeout(() => (saved.value = false), 2500);
 }
@@ -19,31 +24,28 @@ function save() {
 
 <template>
   <div class="page" style="max-width: 480px;">
-    <h1>Accessibility Settings</h1>
-    <p class="muted">Digital literacy and needs vary — these settings help make the Hub usable for everyone.</p>
-
-    <div class="alert info" v-if="saved">Preferences saved.</div>
-
+    <h1>{{ t('accessibility') }}</h1>
+    <p class="muted">{{ t('accessibilityIntro') }}</p>
+    <div class="alert info" role="status" aria-live="polite" v-if="saved">{{ t('saved') }}</div>
     <div class="card">
       <div class="field">
-        <label for="language">Language</label>
-        <select id="language" v-model="language">
-          <option value="en">English</option>
-          <option value="st">Sesotho</option>
+        <label for="language">{{ t('language') }}</label>
+        <select id="language" v-model="accessibility.language">
+          <option value="en">{{ t('english') }}</option>
+          <option value="st">{{ t('sesotho') }}</option>
         </select>
       </div>
-      <div class="field">
-        <label>
-          <input type="checkbox" v-model="largeText" style="width: auto; margin-right: 0.5rem;" />
-          Use large text
-        </label>
-      </div>
-      <button class="btn block" @click="save">Save preferences</button>
+      <div class="field checkbox-field"><label><input type="checkbox" v-model="accessibility.largeText" /> {{ t('largeText') }}</label></div>
+      <div class="field checkbox-field"><label><input type="checkbox" v-model="accessibility.dyslexiaFriendly" /> {{ t('dyslexia') }}</label></div>
+      <div class="field checkbox-field"><label><input type="checkbox" v-model="accessibility.highContrast" /> {{ t('highContrast') }}</label></div>
+      <div class="field checkbox-field"><label><input type="checkbox" v-model="accessibility.colorBlindSafe" /> {{ t('colorBlind') }}</label></div>
+      <div class="field checkbox-field"><label><input type="checkbox" v-model="accessibility.reducedMotion" /> {{ t('reducedMotion') }}</label></div>
+      <div class="field checkbox-field"><label><input type="checkbox" v-model="accessibility.speech" /> {{ t('speech') }}</label></div>
+      <button class="btn block" @click="save">{{ t('save') }}</button>
     </div>
-
     <div class="card">
-      <h3>Need help?</h3>
-      <p class="muted mb-0">Visit any Home Affairs office and ask staff to assist you in person, or use the <router-link to="/ussd">USSD service</router-link> from any phone.</p>
+      <h3>{{ t('needHelp') }}</h3>
+      <p class="muted mb-0">{{ t('ussdHelp') }} <router-link to="/ussd">USSD</router-link>.</p>
     </div>
   </div>
 </template>

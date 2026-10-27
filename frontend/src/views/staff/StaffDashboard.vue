@@ -51,7 +51,7 @@ watch(() => demo.activeProfileKey, load);
     <h1>{{ roleLabels[demo.activeProfile.role] || 'Department' }} Dashboard</h1>
     <p class="muted">Demo account: {{ demo.activeProfile.label }}</p>
 
-    <div class="alert error" v-if="error">{{ error }}</div>
+    <div class="alert error" role="alert" v-if="error">{{ error }}</div>
     <p class="muted" v-if="loading">Loading…</p>
     <div class="grid-2" v-if="!loading && !error">
       <div class="card">

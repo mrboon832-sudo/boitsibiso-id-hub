@@ -35,7 +35,7 @@ watch(() => demo.activeProfileKey, load);
     <h1>Application Tracking</h1>
     <p class="muted">Showing records for {{ demo.activeProfile.label }}.</p>
     <p class="muted" v-if="loading">Loading…</p>
-    <div class="alert error" v-if="error">{{ error }}</div>
+    <div class="alert error" role="alert" v-if="error">{{ error }}</div>
 
     <template v-if="!loading && !error">
       <div class="card">
