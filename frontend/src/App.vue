@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useRouter } from 'vue-router';
 import { useDemoStore } from './store/demo';
@@ -12,8 +12,13 @@ const { t } = useI18n();
 const accessibility = useAccessibilityStore();
 const route = useRoute();
 const router = useRouter();
+const sidebarCollapsed = ref(localStorage.getItem('boitsibiso_staff_sidebar_collapsed') === '1');
 const isPublicRoute = computed(() => route.path === '/' || route.path === '/login');
 const isStaffRoute = computed(() => route.path.startsWith('/staff'));
+function toggleSidebar() {
+  sidebarCollapsed.value = !sidebarCollapsed.value;
+  localStorage.setItem('boitsibiso_staff_sidebar_collapsed', sidebarCollapsed.value ? '1' : '0');
+}
 </script>
 
 <template>
@@ -38,10 +43,11 @@ const isStaffRoute = computed(() => route.path.startsWith('/staff'));
       </select>
     </nav>
   </div>
-  <aside v-if="isStaffRoute" class="staff-sidebar" :aria-label="t('staffNav')">
-    <button type="button" class="sidebar-back" @click="router.back()">← Back</button>
-    <router-link class="sidebar-home" to="/staff/dashboard">Home Affairs hub</router-link>
-    <p class="sidebar-label">Department participants</p>
+  <aside v-if="isStaffRoute" class="staff-sidebar" :class="{ collapsed: sidebarCollapsed }" :aria-label="t('staffNav')">
+    <button type="button" class="sidebar-collapse" :aria-expanded="!sidebarCollapsed" aria-label="Toggle staff menu" @click="toggleSidebar">{{ sidebarCollapsed ? '›' : '‹' }}</button>
+    <button type="button" class="sidebar-back" @click="router.back()"><span class="sidebar-text">← Back</span><span class="sidebar-icon">←</span></button>
+    <router-link class="sidebar-home" to="/staff/dashboard"><span class="sidebar-text">Home Affairs hub</span><span class="sidebar-icon">HA</span></router-link>
+    <p class="sidebar-label sidebar-text">Department participants</p>
     <router-link to="/staff/process-application">Application processing</router-link>
     <router-link to="/staff/verification-request">Identity verification</router-link>
     <router-link to="/staff/passport-review">Passport review</router-link>
@@ -49,7 +55,7 @@ const isStaffRoute = computed(() => route.path.startsWith('/staff'));
     <router-link to="/staff/citizen-profile/9804125012345">Citizen documents</router-link>
     <router-link to="/staff/sharing-log">Sharing and audit log</router-link>
   </aside>
-  <main id="main">
+  <main id="main" :class="{ 'staff-main': isStaffRoute, 'staff-main-collapsed': sidebarCollapsed }">
     <router-view />
   </main>
 </template>

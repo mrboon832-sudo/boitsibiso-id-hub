@@ -114,19 +114,17 @@ async function save() {
         <div class="card">
           <h2>{{ t('sharingLog') }}</h2>
           <p class="muted" v-if="!accessLog.length">{{ t('noActivity') }}</p>
-          <div v-for="e in accessLog" :key="e.id" class="log-entry">
-            <span class="log-who">{{ e.actorName }} ({{ (e.department || 'system').replace('_', ' ') }})</span>
-            <span class="log-when">{{ e.action.replace(/_/g, ' ').toLowerCase() }} · {{ e.timestamp }}</span>
-          </div>
+          <div class="table-wrap" v-else><table class="data-table"><thead><tr><th>Actor</th><th>Department</th><th>Action</th><th>When</th></tr></thead><tbody>
+            <tr v-for="e in accessLog" :key="e.id"><td>{{ e.actorName }}</td><td>{{ (e.department || 'system').replace('_', ' ') }}</td><td>{{ e.action.replace(/_/g, ' ').toLowerCase() }}</td><td>{{ e.timestamp }}</td></tr>
+          </tbody></table></div>
         </div>
 
         <div class="card">
           <h2>Existing documents</h2>
           <p class="muted" v-if="!documents.length">No documents recorded.</p>
-          <div v-for="document in documents" :key="document.id" class="log-entry">
-            <span class="log-who">{{ document.documentType.replace(/_/g, ' ') }} — {{ document.documentNumber }}</span>
-            <span class="log-when">{{ document.status }} · {{ document.issuingDepartment.replace('_', ' ') }}</span>
-          </div>
+          <div class="table-wrap" v-else><table class="data-table"><thead><tr><th>Document</th><th>Number</th><th>Status</th><th>Department</th></tr></thead><tbody>
+            <tr v-for="document in documents" :key="document.id"><td>{{ document.documentType.replace(/_/g, ' ') }}</td><td>{{ document.documentNumber }}</td><td>{{ document.status }}</td><td>{{ document.issuingDepartment.replace('_', ' ') }}</td></tr>
+          </tbody></table></div>
         </div>
       </div>
     </template>

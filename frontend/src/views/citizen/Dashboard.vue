@@ -59,19 +59,17 @@ watch(() => demo.activeProfileKey, load);
       <div class="card">
         <h2>{{ t('activeApplications') }}</h2>
         <p class="muted" v-if="!applications.length">{{ t('noApplications') }}</p>
-        <div v-for="a in applications.slice(0, 4)" :key="a.id" class="log-entry">
-          <span class="log-who">{{ a.serviceType.replace(/_/g, ' ') }} ({{ a.department.replace('_', ' ') }})</span>
-          <span class="chip" :class="a.status">{{ a.status.replace('_', ' ') }}</span>
-        </div>
+        <div class="table-wrap" v-else><table class="data-table"><thead><tr><th>Service</th><th>Department</th><th>Status</th></tr></thead><tbody>
+          <tr v-for="a in applications.slice(0, 4)" :key="a.id"><td>{{ a.serviceType.replace(/_/g, ' ') }}</td><td>{{ a.department.replace('_', ' ') }}</td><td><span class="chip" :class="a.status">{{ a.status.replace('_', ' ') }}</span></td></tr>
+        </tbody></table></div>
       </div>
 
       <div class="card">
         <h2>{{ t('accessedData') }}</h2>
         <p class="muted" v-if="!shareFeed.length">{{ t('noSharing') }}</p>
-        <div v-for="e in shareFeed" :key="e.id" class="log-entry">
-          <span class="log-who">{{ (e.department || 'system').replace('_', ' ') }} — {{ e.action.replace(/_/g, ' ').toLowerCase() }}</span>
-          <span class="log-when">{{ e.timestamp }}</span>
-        </div>
+        <div class="table-wrap" v-if="shareFeed.length"><table class="data-table"><thead><tr><th>Department</th><th>Action</th><th>When</th></tr></thead><tbody>
+          <tr v-for="e in shareFeed" :key="e.id"><td>{{ (e.department || 'system').replace('_', ' ') }}</td><td>{{ e.action.replace(/_/g, ' ').toLowerCase() }}</td><td>{{ e.timestamp }}</td></tr>
+        </tbody></table></div>
         <router-link class="mt-1" style="display:inline-block" to="/citizen/tracking">{{ t('viewFullLog') }}</router-link>
       </div>
     </div>
