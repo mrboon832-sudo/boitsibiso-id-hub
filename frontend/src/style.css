@@ -460,6 +460,12 @@ body.colorblind-safe .chip.flagged::before { content: '! '; }
 .phone-key.end {
   background: #8c2a2a;
 }
+.phone-key.proceed {
+  grid-column: span 2;
+  background: #1f7a43;
+  min-height: 52px;
+}
+.phone-key.proceed:disabled { opacity: .65; cursor: wait; }
 .phone-dial-display {
   min-height: 160px;
   display: flex;

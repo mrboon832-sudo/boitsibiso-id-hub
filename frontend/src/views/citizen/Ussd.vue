@@ -171,9 +171,10 @@ const dialerKeys = [
           <label class="sr-only" for="ussd-input">{{ t('enterId') }}</label>
         <input id="ussd-input" v-model="input" maxlength="40" :placeholder="`${t('numberLabel')} / ID / PIN`" autofocus />
         </form>
-        <div class="phone-keypad">
+        <div class="phone-keypad session-keypad">
           <template v-if="!ended">
             <button v-for="number in [1, 2, 3, 4, 5, 0]" :key="number" class="phone-key" type="button" @click="announceAndSend(String(number))" :aria-label="`${t('keyPressed')}: ${number}`">{{ number }}</button>
+            <button class="phone-key proceed" type="button" @click="send()" :disabled="loading">{{ loading ? t('requesting') : t('proceed') }}</button>
           </template>
           <button class="phone-key end" type="button" @click="endCall">{{ ended ? t('hangUp') : t('endCall') }}</button>
         </div>
