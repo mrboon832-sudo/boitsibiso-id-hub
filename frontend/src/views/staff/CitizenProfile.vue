@@ -114,15 +114,15 @@ async function save() {
         <div class="card">
           <h2>{{ t('sharingLog') }}</h2>
           <p class="muted" v-if="!accessLog.length">{{ t('noActivity') }}</p>
-          <div class="table-wrap" v-else><table class="data-table"><thead><tr><th>Actor</th><th>Department</th><th>Action</th><th>When</th></tr></thead><tbody>
+          <div class="table-wrap" v-else><table class="data-table"><thead><tr><th>{{ t('actorLabel') }}</th><th>{{ t('departmentLabel') }}</th><th>{{ t('actionLabel') }}</th><th>{{ t('whenLabel') }}</th></tr></thead><tbody>
             <tr v-for="e in accessLog" :key="e.id"><td>{{ e.actorName }}</td><td>{{ (e.department || 'system').replace('_', ' ') }}</td><td>{{ e.action.replace(/_/g, ' ').toLowerCase() }}</td><td>{{ e.timestamp }}</td></tr>
           </tbody></table></div>
         </div>
 
         <div class="card">
-          <h2>Existing documents</h2>
-          <p class="muted" v-if="!documents.length">No documents recorded.</p>
-          <div class="table-wrap" v-else><table class="data-table"><thead><tr><th>Document</th><th>Number</th><th>Status</th><th>Department</th></tr></thead><tbody>
+          <h2>{{ t('existingDocuments') }}</h2>
+          <p class="muted" v-if="!documents.length">{{ t('noDocuments') }}</p>
+          <div class="table-wrap" v-else><table class="data-table"><thead><tr><th>{{ t('documentLabel') }}</th><th>{{ t('numberLabel') }}</th><th>{{ t('statusLabel') }}</th><th>{{ t('departmentLabel') }}</th></tr></thead><tbody>
             <tr v-for="document in documents" :key="document.id"><td>{{ document.documentType.replace(/_/g, ' ') }}</td><td>{{ document.documentNumber }}</td><td>{{ document.status }}</td><td>{{ document.issuingDepartment.replace('_', ' ') }}</td></tr>
           </tbody></table></div>
         </div>

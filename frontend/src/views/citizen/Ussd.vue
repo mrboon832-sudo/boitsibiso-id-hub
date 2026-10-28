@@ -65,8 +65,8 @@ async function call() {
   if (loading.value) return;
   if (dialedNumber.value !== USSD_CODE) {
     dialError.value = dialedNumber.value
-      ? `Connection problem or invalid USSD code. Dial ${USSD_CODE}`
-      : `Enter ${USSD_CODE} then press Call`;
+      ? `${t('invalidUssd')} Dial ${USSD_CODE}`
+      : `${t('enterUssd')} ${USSD_CODE}`;
     return;
   }
   loading.value = true;
@@ -149,10 +149,10 @@ const dialerKeys = [
             <span class="letters" v-if="letters">{{ letters }}</span>
           </button>
           <button class="phone-key call" type="button" @click="call" :disabled="loading">{{ t('call') }}</button>
-          <button class="phone-key" type="button" @click="backspaceDialer" aria-label="Backspace">&#9003;</button>
+          <button class="phone-key" type="button" @click="backspaceDialer" :aria-label="t('backspace')">&#9003;</button>
           <button class="phone-key end" type="button" @click="clearDialer">{{ t('clear') }}</button>
         </div>
-        <router-link class="phone-home-link" to="/">&larr; Back to demo home</router-link>
+        <router-link class="phone-home-link" to="/">&larr; {{ t('backDemoHome') }}</router-link>
       </div>
 
       <!-- Active USSD call: live session driven by the shared backend -->
@@ -169,7 +169,7 @@ const dialerKeys = [
         <form v-if="!ended" @submit.prevent="send()" class="phone-input-row">
           <span>&gt;</span>
           <label class="sr-only" for="ussd-input">{{ t('enterId') }}</label>
-          <input id="ussd-input" v-model="input" maxlength="40" placeholder="number / ID / PIN" autofocus />
+        <input id="ussd-input" v-model="input" maxlength="40" :placeholder="`${t('numberLabel')} / ID / PIN`" autofocus />
         </form>
         <div class="phone-keypad">
           <template v-if="!ended">

@@ -56,13 +56,13 @@ async function requestVerification() {
     <div class="alert error" role="alert" v-if="error">{{ error }}</div>
 
     <div class="card">
-      <div class="field"><label>Citizen National ID</label><input v-model="nationalId" placeholder="e.g. 195501011000" /></div>
-      <div class="field"><label>Purpose of request</label><input v-model="purpose" placeholder="e.g. Driver's license renewal identity confirmation" /></div>
+      <div class="field"><label>{{ t('citizenNationalId') }}</label><input v-model="nationalId" placeholder="e.g. 195501011000" /></div>
+      <div class="field"><label>{{ t('purposeOfRequest') }}</label><input v-model="purpose" placeholder="e.g. identity confirmation" /></div>
       <button class="btn block" @click="requestVerification" :disabled="loading">{{ loading ? 'Requesting…' : 'Request verification' }}</button>
     </div>
 
     <div class="card" v-if="result">
-      <h2>Core Identity Data received</h2>
+      <h2>{{ t('coreIdentity') }} received</h2>
       <table class="data-table">
         <tbody>
           <tr v-for="(v, k) in result.dataShared" :key="k"><th>{{ k }}</th><td>{{ v }}</td></tr>

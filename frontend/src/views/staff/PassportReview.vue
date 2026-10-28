@@ -59,7 +59,7 @@ async function requestPoliceCheck() {
     <div class="alert error" role="alert" v-if="error">{{ error }}</div>
 
     <div class="card">
-      <div class="field"><label>Applicant National ID</label><input v-model="nationalId" placeholder="e.g. 196104041003" /></div>
+      <div class="field"><label>{{ t('applicantNationalId') }}</label><input v-model="nationalId" placeholder="e.g. 196104041003" /></div>
       <button class="btn block" @click="lookup" :disabled="loading">{{ loading ? 'Retrieving…' : 'Retrieve applicant' }}</button>
     </div>
 
@@ -68,11 +68,11 @@ async function requestPoliceCheck() {
         <h2>{{ t('profileSummary') }}</h2>
         <p><strong>{{ citizen.fullName }}</strong></p>
         <p class="muted">DOB {{ citizen.dob }} · {{ citizen.gender }} · {{ citizen.district }}</p>
-        <p><strong>Status:</strong> <span class="chip" :class="citizen.status">{{ citizen.status }}</span></p>
+        <p><strong>{{ t('statusLabel') }}:</strong> <span class="chip" :class="citizen.status">{{ citizen.status }}</span></p>
       </div>
 
       <div class="card">
-        <h2>Police flag status</h2>
+        <h2>{{ t('policeFlagStatus') }}</h2>
         <template v-if="flag === undefined">
           <p class="muted">Checking…</p>
         </template>

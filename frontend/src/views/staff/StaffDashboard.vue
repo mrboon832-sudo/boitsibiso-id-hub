@@ -63,7 +63,7 @@ watch(() => demo.activeProfileKey, load);
       <div class="card">
         <h2>{{ t('pendingQueue') }} ({{ queue.filter(a => a.status === 'pending').length }})</h2>
         <p class="muted" v-if="!queue.length">{{ t('noQueue') }}</p>
-        <div class="table-wrap" v-if="queue.length"><table class="data-table"><thead><tr><th>National ID</th><th>Service</th><th>Status</th></tr></thead><tbody>
+        <div class="table-wrap" v-if="queue.length"><table class="data-table"><thead><tr><th>{{ t('nationalIdLabel') }}</th><th>{{ t('serviceLabel') }}</th><th>{{ t('statusLabel') }}</th></tr></thead><tbody>
           <tr v-for="a in queue.slice(0, 6)" :key="a.id"><td>{{ a.nationalId }}</td><td>{{ a.serviceType.replace(/_/g, ' ') }}</td><td><span class="chip" :class="a.status">{{ a.status.replace('_', ' ') }}</span></td></tr>
         </tbody></table></div>
       </div>
@@ -72,7 +72,7 @@ watch(() => demo.activeProfileKey, load);
         <h2>{{ t('notificationsReceived') }}</h2>
         <p class="muted" v-if="notificationsNotice">{{ notificationsNotice }}</p>
         <p class="muted" v-else-if="!notifications.length">{{ t('noPush') }}</p>
-        <div class="table-wrap" v-if="notifications.length"><table class="data-table"><thead><tr><th>National ID</th><th>Notification</th><th>Status</th></tr></thead><tbody>
+        <div class="table-wrap" v-if="notifications.length"><table class="data-table"><thead><tr><th>{{ t('nationalIdLabel') }}</th><th>{{ t('notificationLabel') }}</th><th>{{ t('statusLabel') }}</th></tr></thead><tbody>
           <tr v-for="n in notifications.slice(0, 6)" :key="n.id"><td>{{ n.nationalId }}</td><td>{{ n.type.replace(/_/g, ' ') }}</td><td><span class="chip" :class="n.status">{{ n.status }}</span></td></tr>
         </tbody></table></div>
       </div>
@@ -85,7 +85,7 @@ watch(() => demo.activeProfileKey, load);
         <router-link to="/staff/process-application">Process Application</router-link>
         <router-link to="/staff/citizen-profile/9804125012345">Citizen Profile</router-link>
         <router-link to="/staff/sharing-log">Sharing Log</router-link>
-        <router-link to="/staff/verification-request">Department Verification</router-link>
+        <router-link to="/staff/verification-request">{{ t('identityVerification') }}</router-link>
         <router-link to="/staff/passport-review">Passport Review</router-link>
         <router-link to="/staff/police-flags">Police Flags</router-link>
       </div>

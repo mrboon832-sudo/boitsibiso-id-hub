@@ -42,7 +42,7 @@ const { t } = useI18n();
       <section class="trust-strip">
         <div class="page-width trust-content">
           <span class="trust-label">{{ t('connectedPeople') }}</span>
-          <span>Home Affairs</span><span>Traffic</span><span>Finance</span><span>Pensions</span><span>Police</span><span>Passport Services</span>
+          <span>{{ t('homeAffairs') }}</span><span>{{ t('traffic') }}</span><span>{{ t('finance') }}</span><span>{{ t('pensions') }}</span><span>{{ t('police') }}</span><span>{{ t('passportServices') }}</span>
         </div>
       </section>
 

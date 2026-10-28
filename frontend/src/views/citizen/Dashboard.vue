@@ -59,7 +59,7 @@ watch(() => demo.activeProfileKey, load);
       <div class="card">
         <h2>{{ t('activeApplications') }}</h2>
         <p class="muted" v-if="!applications.length">{{ t('noApplications') }}</p>
-        <div class="table-wrap" v-else><table class="data-table"><thead><tr><th>Service</th><th>Department</th><th>Status</th></tr></thead><tbody>
+        <div class="table-wrap" v-else><table class="data-table"><thead><tr><th>{{ t('serviceLabel') }}</th><th>{{ t('departmentLabel') }}</th><th>{{ t('statusLabel') }}</th></tr></thead><tbody>
           <tr v-for="a in applications.slice(0, 4)" :key="a.id"><td>{{ a.serviceType.replace(/_/g, ' ') }}</td><td>{{ a.department.replace('_', ' ') }}</td><td><span class="chip" :class="a.status">{{ a.status.replace('_', ' ') }}</span></td></tr>
         </tbody></table></div>
       </div>
@@ -67,7 +67,7 @@ watch(() => demo.activeProfileKey, load);
       <div class="card">
         <h2>{{ t('accessedData') }}</h2>
         <p class="muted" v-if="!shareFeed.length">{{ t('noSharing') }}</p>
-        <div class="table-wrap" v-if="shareFeed.length"><table class="data-table"><thead><tr><th>Department</th><th>Action</th><th>When</th></tr></thead><tbody>
+        <div class="table-wrap" v-if="shareFeed.length"><table class="data-table"><thead><tr><th>{{ t('departmentLabel') }}</th><th>{{ t('actionLabel') }}</th><th>{{ t('whenLabel') }}</th></tr></thead><tbody>
           <tr v-for="e in shareFeed" :key="e.id"><td>{{ (e.department || 'system').replace('_', ' ') }}</td><td>{{ e.action.replace(/_/g, ' ').toLowerCase() }}</td><td>{{ e.timestamp }}</td></tr>
         </tbody></table></div>
         <router-link class="mt-1" style="display:inline-block" to="/citizen/tracking">{{ t('viewFullLog') }}</router-link>

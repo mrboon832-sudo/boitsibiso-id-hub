@@ -40,7 +40,7 @@ watch(() => demo.activeProfileKey, load);
 
     <div class="card">
       <div class="field" style="max-width: 320px;">
-        <label for="filter">Filter by National ID</label>
+        <label for="filter">{{ t('filter') }} {{ t('nationalIdLabel') }}</label>
         <input id="filter" v-model="nationalId" @keyup.enter="load" placeholder="e.g. 195501011000" />
       </div>
       <button class="btn secondary" @click="load" :disabled="loading">{{ loading ? 'Loading…' : 'Filter' }}</button>
@@ -49,7 +49,7 @@ watch(() => demo.activeProfileKey, load);
     <div class="card">
       <table class="data-table" v-if="entries.length">
         <thead>
-          <tr><th>When</th><th>Actor</th><th>Department</th><th>Action</th><th>National ID</th></tr>
+          <tr><th>{{ t('whenLabel') }}</th><th>{{ t('actorLabel') }}</th><th>{{ t('departmentLabel') }}</th><th>{{ t('actionLabel') }}</th><th>{{ t('nationalIdLabel') }}</th></tr>
         </thead>
         <tbody>
           <tr v-for="e in entries" :key="e.id">

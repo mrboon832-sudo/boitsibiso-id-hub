@@ -81,7 +81,7 @@ async function respond(reqId, status) {
     <div class="alert info" role="status" aria-live="polite" v-if="success">{{ success }}</div>
 
     <div class="card">
-      <div class="field"><label>Citizen National ID</label><input v-model="nationalId" placeholder="e.g. 196104041003" /></div>
+      <div class="field"><label>{{ t('citizenNationalId') }}</label><input v-model="nationalId" placeholder="e.g. 196104041003" /></div>
       <button class="btn secondary" @click="checkFlag" :disabled="loading">Check existing flag</button>
 
       <div class="mt-1" v-if="flag">
@@ -93,9 +93,9 @@ async function respond(reqId, status) {
     </div>
 
     <div class="card">
-      <h2>Add a new flag</h2>
+      <h2>{{ t('addNewFlag') }}</h2>
       <div class="field">
-        <label>Flag type</label>
+        <label>{{ t('flagType') }}</label>
         <select v-model="flagType">
           <option value="">Select…</option>
           <option value="outstanding_warrant">Outstanding warrant</option>
@@ -104,15 +104,15 @@ async function respond(reqId, status) {
         </select>
       </div>
       <div class="field">
-        <label>Severity</label>
+        <label>{{ t('severity') }}</label>
         <select v-model="severity">
           <option value="low">Low</option>
           <option value="medium">Medium</option>
           <option value="high">High</option>
         </select>
       </div>
-      <div class="field"><label>Case notes (internal, not shared)</label><textarea v-model="notes" rows="2"></textarea></div>
-      <button class="btn block" @click="addFlag">Add flag</button>
+      <div class="field"><label>{{ t('notesInternal') }}</label><textarea v-model="notes" rows="2"></textarea></div>
+      <button class="btn block" @click="addFlag">{{ t('addFlag') }}</button>
     </div>
 
     <div class="card">
@@ -123,8 +123,8 @@ async function respond(reqId, status) {
         <span>
           <span class="chip" :class="r.status">{{ r.status }}</span>
           <template v-if="r.status === 'pending'">
-            <button class="btn secondary" style="padding: 0.2rem 0.6rem; margin-left: 0.5rem;" @click="respond(r.id, 'approved')">Approve</button>
-            <button class="btn danger" style="padding: 0.2rem 0.6rem; margin-left: 0.5rem;" @click="respond(r.id, 'denied')">Deny</button>
+            <button class="btn secondary" style="padding: 0.2rem 0.6rem; margin-left: 0.5rem;" @click="respond(r.id, 'approved')">{{ t('approve') }}</button>
+            <button class="btn danger" style="padding: 0.2rem 0.6rem; margin-left: 0.5rem;" @click="respond(r.id, 'denied')">{{ t('deny') }}</button>
           </template>
         </span>
       </div>

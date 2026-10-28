@@ -46,14 +46,14 @@ function toggleSidebar() {
   <aside v-if="isStaffRoute" class="staff-sidebar" :class="{ collapsed: sidebarCollapsed }" :aria-label="t('staffNav')">
     <button type="button" class="sidebar-collapse" :aria-expanded="!sidebarCollapsed" aria-label="Toggle staff menu" @click="toggleSidebar">{{ sidebarCollapsed ? '›' : '‹' }}</button>
     <button type="button" class="sidebar-back" @click="router.back()"><span class="sidebar-text">← Back</span><span class="sidebar-icon">←</span></button>
-    <router-link class="sidebar-home" to="/staff/dashboard"><span class="sidebar-text">Home Affairs hub</span><span class="sidebar-icon">HA</span></router-link>
-    <p class="sidebar-label sidebar-text">Department participants</p>
-    <router-link to="/staff/process-application">Application processing</router-link>
-    <router-link to="/staff/verification-request">Identity verification</router-link>
-    <router-link to="/staff/passport-review">Passport review</router-link>
-    <router-link to="/staff/police-flags">Police flags</router-link>
-    <router-link to="/staff/citizen-profile/9804125012345">Citizen documents</router-link>
-    <router-link to="/staff/sharing-log">Sharing and audit log</router-link>
+    <router-link class="sidebar-home" to="/staff/dashboard"><span class="sidebar-text">{{ t('homeAffairsHub') }}</span><span class="sidebar-icon">HA</span></router-link>
+    <p class="sidebar-label sidebar-text">{{ t('departmentParticipants') }}</p>
+    <router-link to="/staff/process-application"><span class="sidebar-icon">AP</span><span class="sidebar-text">{{ t('applicationProcessing') }}</span></router-link>
+    <router-link to="/staff/verification-request"><span class="sidebar-icon">IV</span><span class="sidebar-text">{{ t('identityVerification') }}</span></router-link>
+    <router-link to="/staff/passport-review"><span class="sidebar-icon">PR</span><span class="sidebar-text">{{ t('passportReviewLabel') }}</span></router-link>
+    <router-link to="/staff/police-flags"><span class="sidebar-icon">PF</span><span class="sidebar-text">{{ t('policeFlagsLabel') }}</span></router-link>
+    <router-link to="/staff/citizen-profile/9804125012345"><span class="sidebar-icon">CD</span><span class="sidebar-text">{{ t('citizenDocuments') }}</span></router-link>
+    <router-link to="/staff/sharing-log"><span class="sidebar-icon">AL</span><span class="sidebar-text">{{ t('auditLog') }}</span></router-link>
   </aside>
   <main id="main" :class="{ 'staff-main': isStaffRoute, 'staff-main-collapsed': sidebarCollapsed }">
     <router-view />
