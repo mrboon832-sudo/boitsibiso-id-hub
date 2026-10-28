@@ -72,7 +72,18 @@ export const useDemoStore = defineStore('demo', {
     backendReady: false,
   }),
   getters: {
-    activeProfile: (state) => DEMO_PROFILES[state.activeProfileKey] || DEMO_PROFILES.thabo,
+    activeProfile: (state) => {
+      // Depend on backendReady so switching between preserved account sessions
+      // refreshes screens that display the active account label.
+      state.backendReady;
+      if (localStorage.getItem('boitsibiso_auth_mode') === 'real') {
+        try {
+          const user = JSON.parse(localStorage.getItem('boitsibiso_user') || 'null');
+          if (user?.role === 'citizen') return { key: `citizen:${user.nationalId}`, label: `${user.fullName} — Citizen`, username: user.username, role: 'citizen' };
+        } catch { /* fall back to the selected demo profile */ }
+      }
+      return DEMO_PROFILES[state.activeProfileKey] || DEMO_PROFILES.thabo;
+    },
     citizenProfiles: () => Object.values(DEMO_PROFILES).filter((profile) => profile.role === 'citizen'),
     staffProfiles: () => Object.values(DEMO_PROFILES).filter((profile) => profile.role !== 'citizen'),
   },

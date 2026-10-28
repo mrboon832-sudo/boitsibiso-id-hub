@@ -3,9 +3,11 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useDemoStore, DEMO_PROFILES } from '../../store/demo';
 import { useI18n } from '../../i18n';
-import api, { getApiErrorMessage } from '../../api/client';
+import { getApiErrorMessage } from '../../api/client';
+import { useAuthStore } from '../../store/auth';
 
 const demo = useDemoStore();
+const auth = useAuthStore();
 const router = useRouter();
 const loading = ref(false);
 const signInLoading = ref(false);
@@ -17,16 +19,10 @@ async function signIn() {
   signInError.value = '';
   signInLoading.value = true;
   try {
-    const { data } = await api.post('/auth/login', {
-      username: signInForm.value.nationalId.trim(),
-      password: signInForm.value.password,
-    });
-    localStorage.setItem('boitsibiso_token', data.token);
-    localStorage.setItem('boitsibiso_user', JSON.stringify(data.user));
-    localStorage.setItem('boitsibiso_auth_mode', 'real');
+    const user = await auth.login(signInForm.value.nationalId.trim(), signInForm.value.password);
     localStorage.removeItem('boitsibiso_token_profile');
     demo.backendReady = true;
-    await router.push(data.user.role === 'citizen' ? '/citizen/dashboard' : '/staff/dashboard');
+    await router.push(user.role === 'citizen' ? '/citizen/dashboard' : '/staff/dashboard');
   } catch (err) {
     signInError.value = getApiErrorMessage(err, t('signInFailed'));
   } finally {

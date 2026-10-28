@@ -1,24 +1,72 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useRouter } from 'vue-router';
 import { useDemoStore } from './store/demo';
 import { useI18n } from './i18n';
 import { useAccessibilityStore } from './store/accessibility';
+import { useAuthStore } from './store/auth';
 import AccessibilityBar from './components/AccessibilityBar.vue';
 
 const demo = useDemoStore();
+const auth = useAuthStore();
 const { t } = useI18n();
 const accessibility = useAccessibilityStore();
 const route = useRoute();
 const router = useRouter();
-const sidebarCollapsed = ref(localStorage.getItem('boitsibiso_staff_sidebar_collapsed') === '1');
-const isPublicRoute = computed(() => route.path === '/' || route.path === '/login');
-const isStaffRoute = computed(() => route.path.startsWith('/staff'));
-function toggleSidebar() {
-  sidebarCollapsed.value = !sidebarCollapsed.value;
-  localStorage.setItem('boitsibiso_staff_sidebar_collapsed', sidebarCollapsed.value ? '1' : '0');
+const isPublicRoute = computed(() => ['/', '/login', '/register'].includes(route.path));
+const ACCOUNT_SESSIONS_KEY = 'boitsibiso_account_sessions';
+const accountSessions = ref(JSON.parse(localStorage.getItem(ACCOUNT_SESSIONS_KEY) || '{}'));
+const rememberedCitizens = computed(() => Object.values(accountSessions.value).filter((session) => session.mode === 'real' && session.user?.role === 'citizen'));
+const selectedAccount = computed(() => {
+  if (localStorage.getItem('boitsibiso_auth_mode') === 'real' && auth.user?.role === 'citizen') return `citizen:${auth.user.nationalId}`;
+  return demo.activeProfileKey;
+});
+
+function persistSessions() {
+  localStorage.setItem(ACCOUNT_SESSIONS_KEY, JSON.stringify(accountSessions.value));
 }
+
+function rememberCurrentAccount(key) {
+  const token = localStorage.getItem('boitsibiso_token');
+  const user = JSON.parse(localStorage.getItem('boitsibiso_user') || 'null');
+  if (!token || !user) return;
+  accountSessions.value[key] = { token, user, mode: localStorage.getItem('boitsibiso_auth_mode') || 'demo', profileKey: localStorage.getItem('boitsibiso_token_profile') || null };
+  persistSessions();
+}
+
+function restoreAccount(key) {
+  const session = accountSessions.value[key];
+  if (!session) return false;
+  localStorage.setItem('boitsibiso_token', session.token);
+  localStorage.setItem('boitsibiso_user', JSON.stringify(session.user));
+  localStorage.setItem('boitsibiso_auth_mode', session.mode);
+  if (session.profileKey) localStorage.setItem('boitsibiso_token_profile', session.profileKey);
+  else localStorage.removeItem('boitsibiso_token_profile');
+  auth.$patch({ token: session.token, user: session.user });
+  demo.backendReady = true;
+  return true;
+}
+
+async function switchAccount(value) {
+  rememberCurrentAccount(selectedAccount.value);
+  if (value.startsWith('citizen:')) {
+    restoreAccount(value);
+    await router.push('/citizen/dashboard');
+    return;
+  }
+  demo.setActiveProfile(value);
+  const restored = restoreAccount(value);
+  if (!restored) auth.$patch({ token: null, user: null });
+  const target = demo.activeProfile.role === 'citizen' ? '/citizen/dashboard' : '/staff/dashboard';
+  await router.push(target);
+}
+
+watch(() => auth.user, (user) => {
+  if (user?.role === 'citizen' && localStorage.getItem('boitsibiso_auth_mode') === 'real') {
+    rememberCurrentAccount(`citizen:${user.nationalId}`);
+  }
+}, { deep: true, immediate: true });
 </script>
 
 <template>
@@ -33,9 +81,10 @@ function toggleSidebar() {
       <router-link to="/citizen/dashboard">{{ t('citizenNav') }}</router-link>
       <router-link to="/staff/dashboard">{{ t('staffNav') }}</router-link>
       <router-link to="/ussd">{{ t('navUssd') }}</router-link>
-      <select class="profile-select" :value="demo.activeProfileKey" @change="demo.setActiveProfile($event.target.value)" :aria-label="t('demoAccount')">
+      <select class="profile-select" :value="selectedAccount" @change="switchAccount($event.target.value)" :aria-label="t('demoAccount')">
         <optgroup label="Citizens">
           <option v-for="profile in demo.citizenProfiles" :key="profile.key" :value="profile.key">{{ profile.label }}</option>
+          <option v-for="citizen in rememberedCitizens" :key="`citizen-${citizen.user.nationalId}`" :value="`citizen:${citizen.user.nationalId}`">{{ citizen.user.fullName }} — {{ citizen.user.nationalId }}</option>
         </optgroup>
         <optgroup label="Staff departments">
           <option v-for="profile in demo.staffProfiles" :key="profile.key" :value="profile.key">{{ profile.label }}</option>
@@ -43,7 +92,7 @@ function toggleSidebar() {
       </select>
     </nav>
   </div>
-  <aside v-if="isStaffRoute" class="staff-sidebar" :class="{ collapsed: sidebarCollapsed }" :aria-label="t('staffNav')">
+  <!-- Staff sidebar removed: staff navigation is handled by the top account switcher and screen links.
     <button type="button" class="sidebar-collapse" :aria-expanded="!sidebarCollapsed" aria-label="Toggle staff menu" @click="toggleSidebar">{{ sidebarCollapsed ? '›' : '‹' }}</button>
     <button type="button" class="sidebar-back" @click="router.back()"><span class="sidebar-text">← Back</span><span class="sidebar-icon">←</span></button>
     <router-link class="sidebar-home" to="/staff/dashboard"><span class="sidebar-text">{{ t('homeAffairsHub') }}</span><span class="sidebar-icon">HA</span></router-link>
@@ -54,8 +103,8 @@ function toggleSidebar() {
     <router-link to="/staff/police-flags"><span class="sidebar-icon">PF</span><span class="sidebar-text">{{ t('policeFlagsLabel') }}</span></router-link>
     <router-link to="/staff/citizen-profile/9804125012345"><span class="sidebar-icon">CD</span><span class="sidebar-text">{{ t('citizenDocuments') }}</span></router-link>
     <router-link to="/staff/sharing-log"><span class="sidebar-icon">AL</span><span class="sidebar-text">{{ t('auditLog') }}</span></router-link>
-  </aside>
-  <main id="main" :class="{ 'staff-main': isStaffRoute, 'staff-main-collapsed': sidebarCollapsed }">
+  -->
+  <main id="main">
     <router-view />
   </main>
 </template>
