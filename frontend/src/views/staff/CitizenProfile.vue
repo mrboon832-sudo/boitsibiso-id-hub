@@ -3,9 +3,11 @@ import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import api, { getApiErrorMessage } from '../../api/client';
 import { useDemoStore } from '../../store/demo';
+import { useI18n } from '../../i18n';
 
 const route = useRoute();
 const demo = useDemoStore();
+const { t } = useI18n();
 const citizen = ref(null);
 const accessLog = ref([]);
 const loading = ref(true);
@@ -62,14 +64,14 @@ async function save() {
 
 <template>
   <div class="page">
-    <h1>Citizen Profile Management</h1>
-    <p class="muted" v-if="loading">Loading…</p>
+    <h1>{{ t('citizenProfile') }}</h1>
+    <p class="muted" v-if="loading">{{ t('loading') }}</p>
     <div class="alert error" role="alert" v-if="error">{{ error }}</div>
 
     <template v-if="citizen">
       <div class="grid-2">
         <div class="card">
-          <h2>Core Identity & Civil Status Data</h2>
+          <h2>{{ t('profileSummary') }}</h2>
           <p><strong>{{ citizen.fullName }}</strong> — {{ citizen.nationalId }}</p>
           <p class="muted">DOB {{ citizen.dob }} · {{ citizen.gender }} · {{ citizen.district }}</p>
           <div class="alert info" role="status" aria-live="polite" v-if="success">{{ success }}</div>
@@ -102,8 +104,8 @@ async function save() {
         </div>
 
         <div class="card">
-          <h2>Access & audit log for this citizen</h2>
-          <p class="muted" v-if="!accessLog.length">No access recorded yet.</p>
+          <h2>{{ t('sharingLog') }}</h2>
+          <p class="muted" v-if="!accessLog.length">{{ t('noActivity') }}</p>
           <div v-for="e in accessLog" :key="e.id" class="log-entry">
             <span class="log-who">{{ e.actorName }} ({{ (e.department || 'system').replace('_', ' ') }})</span>
             <span class="log-when">{{ e.action.replace(/_/g, ' ').toLowerCase() }} · {{ e.timestamp }}</span>

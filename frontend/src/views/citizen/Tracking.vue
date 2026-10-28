@@ -2,8 +2,10 @@
 import { ref, onMounted, watch } from 'vue';
 import api, { getApiErrorMessage } from '../../api/client';
 import { useDemoStore } from '../../store/demo';
+import { useI18n } from '../../i18n';
 
 const demo = useDemoStore();
+const { t } = useI18n();
 const applications = ref([]);
 const shareFeed = ref([]);
 const loading = ref(true);
@@ -32,17 +34,17 @@ watch(() => demo.activeProfileKey, load);
 
 <template>
   <div class="page">
-    <h1>Application Tracking</h1>
-    <p class="muted">Showing records for {{ demo.activeProfile.label }}.</p>
-    <p class="muted" v-if="loading">Loading…</p>
+    <h1>{{ t('applicationTracking') }}</h1>
+    <p class="muted">{{ t('showingRecords') }} {{ demo.activeProfile.label }}.</p>
+    <p class="muted" v-if="loading">{{ t('loading') }}</p>
     <div class="alert error" role="alert" v-if="error">{{ error }}</div>
 
     <template v-if="!loading && !error">
       <div class="card">
-        <h2>Your applications</h2>
+        <h2>{{ t('yourApplications') }}</h2>
         <table class="data-table" v-if="applications.length">
           <thead>
-            <tr><th>Service</th><th>Department</th><th>Channel</th><th>Status</th><th>Submitted</th></tr>
+            <tr><th>{{ t('service') }}</th><th>{{ t('department') }}</th><th>{{ t('channel') }}</th><th>{{ t('status') }}</th><th>{{ t('submitted') }}</th></tr>
           </thead>
           <tbody>
             <tr v-for="a in applications" :key="a.id">
@@ -54,17 +56,17 @@ watch(() => demo.activeProfileKey, load);
             </tr>
           </tbody>
         </table>
-        <p class="muted" v-else>No applications submitted yet.</p>
+        <p class="muted" v-else>{{ t('noSubmitted') }}</p>
       </div>
 
       <div class="card">
-        <h2>Data-sharing feed</h2>
-        <p class="muted">Every time a department views or receives your data — whether you requested it (pull) or it happened automatically (push) — it's logged here for full transparency.</p>
+        <h2>{{ t('dataFeed') }}</h2>
+        <p class="muted">{{ t('feedIntro') }}</p>
         <div v-for="e in shareFeed" :key="e.id" class="log-entry">
           <span class="log-who">{{ (e.department || 'system').replace('_', ' ') }} — {{ e.action.replace(/_/g, ' ').toLowerCase() }}</span>
           <span class="log-when">{{ e.timestamp }}</span>
         </div>
-        <p class="muted" v-if="!shareFeed.length">No activity recorded yet.</p>
+        <p class="muted" v-if="!shareFeed.length">{{ t('noActivity') }}</p>
       </div>
     </template>
   </div>

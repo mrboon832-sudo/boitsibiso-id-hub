@@ -2,8 +2,10 @@
 import { ref, onMounted, watch } from 'vue';
 import api, { getApiErrorMessage } from '../../api/client';
 import { useDemoStore } from '../../store/demo';
+import { useI18n } from '../../i18n';
 
 const demo = useDemoStore();
+const { t } = useI18n();
 const nationalId = ref('9804125012345');
 const purpose = ref('');
 const result = ref(null);
@@ -48,7 +50,7 @@ async function requestVerification() {
 
 <template>
   <div class="page">
-    <h1>Department Verification Request</h1>
+    <h1>{{ t('verificationRequest') }}</h1>
     <p class="muted">Pull Core Identity Data from Home Affairs instead of asking the citizen for a certified copy. Demo account: {{ demo.activeProfile.label }}.</p>
 
     <div class="alert error" role="alert" v-if="error">{{ error }}</div>
@@ -70,8 +72,8 @@ async function requestVerification() {
     </div>
 
     <div class="card">
-      <h2>Recent requests from your department</h2>
-      <p class="muted" v-if="!history.length">No requests yet.</p>
+      <h2>{{ t('verificationRequest') }}</h2>
+      <p class="muted" v-if="!history.length">{{ t('noActivity') }}</p>
       <div v-for="h in history" :key="h.id" class="log-entry">
         <span class="log-who">{{ h.nationalId }} — {{ h.purpose }}</span>
         <span class="log-when"><span class="chip" :class="h.status">{{ h.status }}</span> {{ h.requestedAt }}</span>

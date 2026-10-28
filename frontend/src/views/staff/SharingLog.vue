@@ -2,8 +2,10 @@
 import { ref, onMounted, watch } from 'vue';
 import api, { getApiErrorMessage } from '../../api/client';
 import { useDemoStore } from '../../store/demo';
+import { useI18n } from '../../i18n';
 
 const demo = useDemoStore();
+const { t } = useI18n();
 const nationalId = ref('9804125012345');
 const entries = ref([]);
 const loading = ref(false);
@@ -32,7 +34,7 @@ watch(() => demo.activeProfileKey, load);
 
 <template>
   <div class="page">
-    <h1>Notification Rules & Sharing Log</h1>
+    <h1>{{ t('sharingLog') }}</h1>
     <p class="muted">Every pull request and push notification across departments is logged here — the central proof of traceability.</p>
     <div class="alert error" role="alert" v-if="error">{{ error }}</div>
 
@@ -59,7 +61,7 @@ watch(() => demo.activeProfileKey, load);
           </tr>
         </tbody>
       </table>
-      <p class="muted" v-else>No log entries found.</p>
+      <p class="muted" v-else>{{ t('noActivity') }}</p>
     </div>
   </div>
 </template>

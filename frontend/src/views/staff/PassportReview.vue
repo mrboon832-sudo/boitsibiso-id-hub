@@ -2,8 +2,10 @@
 import { ref, onMounted, watch } from 'vue';
 import api, { getApiErrorMessage } from '../../api/client';
 import { useDemoStore } from '../../store/demo';
+import { useI18n } from '../../i18n';
 
 const demo = useDemoStore();
+const { t } = useI18n();
 const nationalId = ref('9207157012347');
 const citizen = ref(null);
 const flag = ref(undefined); // undefined = not checked yet, null = no flag, object = flag exists
@@ -51,7 +53,7 @@ async function requestPoliceCheck() {
 
 <template>
   <div class="page">
-    <h1>Passport Applicant Review</h1>
+    <h1>{{ t('passportReview') }}</h1>
     <p class="muted">Core Identity Data is pulled automatically from Home Affairs; if Police has already shared a flag it appears here immediately.</p>
 
     <div class="alert error" role="alert" v-if="error">{{ error }}</div>
@@ -63,7 +65,7 @@ async function requestPoliceCheck() {
 
     <div class="grid-2" v-if="citizen">
       <div class="card">
-        <h2>Core Identity Data</h2>
+        <h2>{{ t('profileSummary') }}</h2>
         <p><strong>{{ citizen.fullName }}</strong></p>
         <p class="muted">DOB {{ citizen.dob }} · {{ citizen.gender }} · {{ citizen.district }}</p>
         <p><strong>Status:</strong> <span class="chip" :class="citizen.status">{{ citizen.status }}</span></p>

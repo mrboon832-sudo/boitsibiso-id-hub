@@ -14,7 +14,7 @@ const isPublicRoute = computed(() => route.path === '/' || route.path === '/logi
 </script>
 
 <template>
-  <a href="#main" class="skip-link">Skip to content</a>
+  <a href="#main" class="skip-link">{{ t('skipToContent') }}</a>
   <div class="sr-only" aria-live="polite" aria-atomic="true">{{ accessibility.liveMessage }}</div>
   <AccessibilityBar />
   <div class="topbar" v-if="!isPublicRoute && route.path !== '/ussd'">
@@ -23,8 +23,8 @@ const isPublicRoute = computed(() => route.path === '/' || route.path === '/logi
       Boitsibiso National ID Hub — Demo Screenshot Mode
     </router-link>
     <nav>
-      <router-link to="/citizen/dashboard">{{ t('navCitizen') }}</router-link>
-      <router-link to="/staff/dashboard">{{ t('navStaff') }}</router-link>
+      <router-link to="/citizen/dashboard">{{ t('citizenNav') }}</router-link>
+      <router-link to="/staff/dashboard">{{ t('staffNav') }}</router-link>
       <router-link to="/ussd">{{ t('navUssd') }}</router-link>
       <select class="profile-select" :value="demo.activeProfileKey" @change="demo.setActiveProfile($event.target.value)" :aria-label="t('demoAccount')">
         <optgroup label="Citizens">

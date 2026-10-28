@@ -2,8 +2,10 @@
 import { ref, onMounted, watch } from 'vue';
 import api, { getApiErrorMessage } from '../../api/client';
 import { useDemoStore } from '../../store/demo';
+import { useI18n } from '../../i18n';
 
 const demo = useDemoStore();
+const { t } = useI18n();
 const queue = ref([]);
 const notifications = ref([]);
 const loading = ref(true);
@@ -18,6 +20,10 @@ const roleLabels = {
   passport: 'Passport Services',
   finance: 'Finance',
   admin: 'Administrator',
+};
+const roleLabelKeys = {
+  home_affairs: 'homeAffairs', traffic: 'traffic', pensions: 'pensions',
+  police: 'police', passport: 'passportServices', finance: 'finance', admin: 'administrator',
 };
 
 async function load() {
@@ -48,15 +54,15 @@ watch(() => demo.activeProfileKey, load);
 
 <template>
   <div class="page">
-    <h1>{{ roleLabels[demo.activeProfile.role] || 'Department' }} Dashboard</h1>
-    <p class="muted">Demo account: {{ demo.activeProfile.label }}</p>
+    <h1>{{ t(roleLabelKeys[demo.activeProfile.role] || 'departmentFallback') }} {{ t('dashboard') }}</h1>
+    <p class="muted">{{ t('demoAccountText') }} {{ demo.activeProfile.label }}</p>
 
     <div class="alert error" role="alert" v-if="error">{{ error }}</div>
-    <p class="muted" v-if="loading">Loading…</p>
+    <p class="muted" v-if="loading">{{ t('loading') }}</p>
     <div class="grid-2" v-if="!loading && !error">
       <div class="card">
-        <h2>Pending queue ({{ queue.filter(a => a.status === 'pending').length }})</h2>
-        <p class="muted" v-if="!queue.length">No applications for your department yet.</p>
+        <h2>{{ t('pendingQueue') }} ({{ queue.filter(a => a.status === 'pending').length }})</h2>
+        <p class="muted" v-if="!queue.length">{{ t('noQueue') }}</p>
         <div v-for="a in queue.slice(0, 6)" :key="a.id" class="log-entry">
           <span class="log-who">{{ a.nationalId }} — {{ a.serviceType.replace(/_/g, ' ') }}</span>
           <span class="chip" :class="a.status">{{ a.status.replace('_', ' ') }}</span>
@@ -64,9 +70,9 @@ watch(() => demo.activeProfileKey, load);
       </div>
 
       <div class="card">
-        <h2>Notifications received</h2>
+        <h2>{{ t('notificationsReceived') }}</h2>
         <p class="muted" v-if="notificationsNotice">{{ notificationsNotice }}</p>
-        <p class="muted" v-else-if="!notifications.length">No push notifications yet.</p>
+        <p class="muted" v-else-if="!notifications.length">{{ t('noPush') }}</p>
         <div v-for="n in notifications.slice(0, 6)" :key="n.id" class="log-entry">
           <span class="log-who">{{ n.nationalId }} — {{ n.type.replace(/_/g, ' ') }}</span>
           <span class="chip" :class="n.status">{{ n.status }}</span>
@@ -75,7 +81,7 @@ watch(() => demo.activeProfileKey, load);
     </div>
 
     <div class="card">
-      <h2>All staff screens</h2>
+      <h2>{{ t('allStaffScreens') }}</h2>
       <p class="muted">Open any department screen for documentation screenshots. Select the matching department account first where the backend enforces a role.</p>
       <div class="screen-links">
         <router-link to="/staff/process-application">Process Application</router-link>

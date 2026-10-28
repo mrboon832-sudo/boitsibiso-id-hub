@@ -2,8 +2,10 @@
 import { ref, onMounted, watch } from 'vue';
 import api, { getApiErrorMessage } from '../../api/client';
 import { useDemoStore } from '../../store/demo';
+import { useI18n } from '../../i18n';
 
 const demo = useDemoStore();
+const { t } = useI18n();
 const citizen = ref(null);
 const applications = ref([]);
 const shareFeed = ref([]);
@@ -35,28 +37,28 @@ watch(() => demo.activeProfileKey, load);
 
 <template>
   <div class="page">
-    <h1>Welcome, {{ citizen?.fullName || demo.activeProfile.label }}</h1>
-    <p class="muted" v-if="loading">Loading your profile…</p>
+    <h1>{{ t('welcome') }}, {{ citizen?.fullName || demo.activeProfile.label }}</h1>
+    <p class="muted" v-if="loading">{{ t('loading') }}</p>
     <div class="alert error" role="alert" v-if="error">{{ error }}</div>
 
     <div class="grid-2" v-if="citizen">
       <div class="card">
-        <h2>Profile summary</h2>
-        <p><strong>National ID:</strong> {{ citizen.nationalId }}</p>
-        <p><strong>Status:</strong> <span class="chip" :class="citizen.status">{{ citizen.status }}</span></p>
-        <p><strong>District:</strong> {{ citizen.district }}</p>
-        <p><strong>Phone:</strong> {{ citizen.phone }}</p>
+        <h2>{{ t('profileSummary') }}</h2>
+        <p><strong>{{ t('nationalId') }}:</strong> {{ citizen.nationalId }}</p>
+        <p><strong>{{ t('status') }}:</strong> <span class="chip" :class="citizen.status">{{ citizen.status }}</span></p>
+        <p><strong>{{ t('district') }}:</strong> {{ citizen.district }}</p>
+        <p><strong>{{ t('phone') }}:</strong> {{ citizen.phone }}</p>
       </div>
 
       <div class="card">
-        <h2>Quick actions</h2>
-        <router-link class="btn block" to="/citizen/request-service">Request a Service</router-link>
-        <router-link class="btn secondary block mt-1" to="/citizen/tracking">Track My Applications</router-link>
+        <h2>{{ t('quickActions') }}</h2>
+        <router-link class="btn block" to="/citizen/request-service">{{ t('requestService') }}</router-link>
+        <router-link class="btn secondary block mt-1" to="/citizen/tracking">{{ t('trackApplications') }}</router-link>
       </div>
 
       <div class="card">
-        <h2>Active applications</h2>
-        <p class="muted" v-if="!applications.length">No applications yet.</p>
+        <h2>{{ t('activeApplications') }}</h2>
+        <p class="muted" v-if="!applications.length">{{ t('noApplications') }}</p>
         <div v-for="a in applications.slice(0, 4)" :key="a.id" class="log-entry">
           <span class="log-who">{{ a.serviceType.replace(/_/g, ' ') }} ({{ a.department.replace('_', ' ') }})</span>
           <span class="chip" :class="a.status">{{ a.status.replace('_', ' ') }}</span>
@@ -64,13 +66,13 @@ watch(() => demo.activeProfileKey, load);
       </div>
 
       <div class="card">
-        <h2>Who has accessed my data</h2>
-        <p class="muted" v-if="!shareFeed.length">No data-sharing activity yet.</p>
+        <h2>{{ t('accessedData') }}</h2>
+        <p class="muted" v-if="!shareFeed.length">{{ t('noSharing') }}</p>
         <div v-for="e in shareFeed" :key="e.id" class="log-entry">
           <span class="log-who">{{ (e.department || 'system').replace('_', ' ') }} — {{ e.action.replace(/_/g, ' ').toLowerCase() }}</span>
           <span class="log-when">{{ e.timestamp }}</span>
         </div>
-        <router-link class="mt-1" style="display:inline-block" to="/citizen/tracking">View full log →</router-link>
+        <router-link class="mt-1" style="display:inline-block" to="/citizen/tracking">{{ t('viewFullLog') }}</router-link>
       </div>
     </div>
   </div>

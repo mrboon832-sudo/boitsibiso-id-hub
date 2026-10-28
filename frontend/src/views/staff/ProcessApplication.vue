@@ -2,8 +2,10 @@
 import { ref, onMounted, watch } from 'vue';
 import api, { getApiErrorMessage } from '../../api/client';
 import { useDemoStore } from '../../store/demo';
+import { useI18n } from '../../i18n';
 
 const demo = useDemoStore();
+const { t } = useI18n();
 const applications = ref([]);
 const loading = ref(true);
 const updating = ref(null);
@@ -16,7 +18,7 @@ async function load() {
     const { data } = await api.get('/applications');
     applications.value = data.applications;
   } catch (err) {
-    error.value = getApiErrorMessage(err, 'Could not load applications.');
+    error.value = getApiErrorMessage(err, t('couldNotLoad'));
   } finally {
     loading.value = false;
   }
@@ -38,15 +40,15 @@ async function updateStatus(app, status) {
 
 <template>
   <div class="page">
-    <h1>Process Applications</h1>
-    <p class="muted">Confirm identity, process the request, and move it forward. Death registrations automatically notify Pensions. Demo account: {{ demo.activeProfile.label }}.</p>
+    <h1>{{ t('processApplications') }}</h1>
+    <p class="muted">{{ t('processIntro') }} {{ t('demoAccountText') }} {{ demo.activeProfile.label }}.</p>
 
-    <p class="muted" v-if="loading">Loading…</p>
+    <p class="muted" v-if="loading">{{ t('loading') }}</p>
     <div class="alert error" role="alert" v-if="error">{{ error }}</div>
     <div class="card" v-if="!loading && !error">
       <table class="data-table" v-if="applications.length">
         <thead>
-          <tr><th>National ID</th><th>Service</th><th>Channel</th><th>Status</th><th>Actions</th></tr>
+          <tr><th>{{ t('nationalId') }}</th><th>{{ t('service') }}</th><th>{{ t('channel') }}</th><th>{{ t('status') }}</th><th>{{ t('actions') }}</th></tr>
         </thead>
         <tbody>
           <tr v-for="a in applications" :key="a.id">
@@ -58,17 +60,17 @@ async function updateStatus(app, status) {
             <td><span class="chip" :class="a.status">{{ a.status.replace('_', ' ') }}</span></td>
             <td>
               <select :value="a.status" @change="updateStatus(a, $event.target.value)" :disabled="updating === a.id">
-                <option value="pending">Pending</option>
-                <option value="in_review">In review</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="completed">Completed</option>
-                <option value="rejected">Rejected</option>
+                <option value="pending">{{ t('pending') }}</option>
+                <option value="in_review">{{ t('inReview') }}</option>
+                <option value="confirmed">{{ t('confirmed') }}</option>
+                <option value="completed">{{ t('completed') }}</option>
+                <option value="rejected">{{ t('rejected') }}</option>
               </select>
             </td>
           </tr>
         </tbody>
       </table>
-      <p class="muted" v-else>No applications in your queue.</p>
+      <p class="muted" v-else>{{ t('noQueueApps') }}</p>
     </div>
   </div>
 </template>

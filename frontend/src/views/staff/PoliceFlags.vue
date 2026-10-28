@@ -2,8 +2,10 @@
 import { ref, onMounted, watch } from 'vue';
 import api, { getApiErrorMessage } from '../../api/client';
 import { useDemoStore } from '../../store/demo';
+import { useI18n } from '../../i18n';
 
 const demo = useDemoStore();
+const { t } = useI18n();
 const nationalId = ref('9207157012347');
 const flag = ref(null);
 const flagType = ref('');
@@ -72,7 +74,7 @@ async function respond(reqId, status) {
 
 <template>
   <div class="page">
-    <h1>Add / View Flag (Police)</h1>
+    <h1>{{ t('policeFlags') }}</h1>
     <p class="muted">Police control disclosure — other departments only ever see whether a flag exists, never the case details.</p>
 
     <div class="alert error" role="alert" v-if="error">{{ error }}</div>
@@ -114,7 +116,7 @@ async function respond(reqId, status) {
     </div>
 
     <div class="card">
-      <h2>Incoming flag check requests</h2>
+      <h2>{{ t('policeFlags') }}</h2>
       <p class="muted" v-if="!requests.length">No pending requests.</p>
       <div v-for="r in requests" :key="r.id" class="log-entry">
         <span class="log-who">{{ r.requesting_department }} — {{ r.national_id }}</span>
