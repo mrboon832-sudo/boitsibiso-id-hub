@@ -8,14 +8,15 @@ const { asyncHandler } = require('../middleware/asyncHandler');
 const router = express.Router();
 
 function toView(a) {
+  const legacyIdRenewal = a.service_type === 'id_renewal';
   return {
     id: a.id,
     nationalId: a.national_id,
-    serviceType: a.service_type,
+    serviceType: legacyIdRenewal ? 'id_application' : a.service_type,
     department: a.department,
     status: a.status,
     channel: a.channel,
-    applicationVariant: a.application_variant,
+    applicationVariant: a.application_variant || (legacyIdRenewal ? 'renewal' : null),
     notes: a.notes,
     submittedAt: a.submitted_at,
     updatedAt: a.updated_at,
