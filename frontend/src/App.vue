@@ -16,7 +16,17 @@ const route = useRoute();
 const router = useRouter();
 const isPublicRoute = computed(() => ['/', '/login', '/register'].includes(route.path));
 const ACCOUNT_SESSIONS_KEY = 'boitsibiso_account_sessions';
-const accountSessions = ref(JSON.parse(localStorage.getItem(ACCOUNT_SESSIONS_KEY) || '{}'));
+function readAccountSessions() {
+  try {
+    const sessions = JSON.parse(localStorage.getItem(ACCOUNT_SESSIONS_KEY) || '{}');
+    // Remove legacy/stale entries created before explicit session tracking.
+    return Object.fromEntries(Object.entries(sessions).filter(([, session]) => session?.loggedIn === true && session.token && session.user));
+  } catch {
+    return {};
+  }
+}
+const accountSessions = ref(readAccountSessions());
+localStorage.setItem(ACCOUNT_SESSIONS_KEY, JSON.stringify(accountSessions.value));
 const rememberedCitizens = computed(() => Object.values(accountSessions.value).filter((session) => session.mode === 'real' && session.user?.role === 'citizen'));
 const selectedAccount = computed(() => {
   if (localStorage.getItem('boitsibiso_auth_mode') === 'real' && auth.user) {
@@ -35,7 +45,7 @@ function rememberCurrentAccount(key) {
   const token = localStorage.getItem('boitsibiso_token');
   const user = JSON.parse(localStorage.getItem('boitsibiso_user') || 'null');
   if (!token || !user) return;
-  accountSessions.value[key] = { token, user, mode: localStorage.getItem('boitsibiso_auth_mode') || 'demo', profileKey: localStorage.getItem('boitsibiso_token_profile') || null };
+  accountSessions.value[key] = { token, user, mode: localStorage.getItem('boitsibiso_auth_mode') || 'demo', profileKey: localStorage.getItem('boitsibiso_token_profile') || null, loggedIn: true };
   persistSessions();
 }
 
