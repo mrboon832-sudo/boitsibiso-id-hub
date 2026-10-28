@@ -22,14 +22,19 @@ async function load() {
   loading.value = true;
   error.value = '';
   try {
-    const [citizenRes, logRes, documentsRes] = await Promise.all([
+    const [citizenRes, logRes] = await Promise.all([
       api.get(`/citizens/${route.params.nationalId}`),
       api.get('/audit-log', { params: { nationalId: route.params.nationalId } }),
-      api.get(`/citizens/${route.params.nationalId}/documents`),
     ]);
     citizen.value = citizenRes.data.citizen;
     accessLog.value = logRes.data.entries;
-    documents.value = documentsRes.data.documents;
+    try {
+      const documentsRes = await api.get(`/citizens/${route.params.nationalId}/documents`);
+      documents.value = documentsRes.data.documents;
+    } catch {
+      // Keep the citizen profile usable with an older backend while it is restarting.
+      documents.value = [];
+    }
     form.value = {
       address: citizen.value.address,
       district: citizen.value.district,
