@@ -28,6 +28,7 @@ export const useAuthStore = defineStore('auth', {
       localStorage.removeItem('boitsibiso_token');
       localStorage.removeItem('boitsibiso_user');
       localStorage.removeItem('boitsibiso_auth_mode');
+      localStorage.removeItem('boitsibiso_token_profile');
     },
     async updatePreferences(prefs) {
       const { data } = await api.put('/auth/preferences', prefs);

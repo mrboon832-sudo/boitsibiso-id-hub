@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useRouter } from 'vue-router';
-import { useDemoStore } from './store/demo';
+import { useDemoStore, DEMO_PROFILES } from './store/demo';
 import { useI18n } from './i18n';
 import { useAccessibilityStore } from './store/accessibility';
 import { useAuthStore } from './store/auth';
@@ -19,7 +19,11 @@ const ACCOUNT_SESSIONS_KEY = 'boitsibiso_account_sessions';
 const accountSessions = ref(JSON.parse(localStorage.getItem(ACCOUNT_SESSIONS_KEY) || '{}'));
 const rememberedCitizens = computed(() => Object.values(accountSessions.value).filter((session) => session.mode === 'real' && session.user?.role === 'citizen'));
 const selectedAccount = computed(() => {
-  if (localStorage.getItem('boitsibiso_auth_mode') === 'real' && auth.user?.role === 'citizen') return `citizen:${auth.user.nationalId}`;
+  if (localStorage.getItem('boitsibiso_auth_mode') === 'real' && auth.user) {
+    if (auth.user.role === 'citizen') return `citizen:${auth.user.nationalId}`;
+    const staffProfile = Object.values(DEMO_PROFILES).find((profile) => profile.username === auth.user.username);
+    if (staffProfile) return staffProfile.key;
+  }
   return demo.activeProfileKey;
 });
 
@@ -62,6 +66,18 @@ async function switchAccount(value) {
   await router.push(target);
 }
 
+async function logout() {
+  const key = selectedAccount.value;
+  if (key.startsWith('citizen:') || localStorage.getItem('boitsibiso_auth_mode') === 'real') {
+    delete accountSessions.value[key];
+    persistSessions();
+  }
+  auth.logout();
+  localStorage.removeItem('boitsibiso_token_profile');
+  demo.backendReady = false;
+  await router.push('/login');
+}
+
 watch(() => auth.user, (user) => {
   if (user?.role === 'citizen' && localStorage.getItem('boitsibiso_auth_mode') === 'real') {
     rememberCurrentAccount(`citizen:${user.nationalId}`);
@@ -90,6 +106,7 @@ watch(() => auth.user, (user) => {
           <option v-for="profile in demo.staffProfiles" :key="profile.key" :value="profile.key">{{ profile.label }}</option>
         </optgroup>
       </select>
+      <button type="button" class="link topbar-logout" @click="logout">{{ t('logout') }}</button>
     </nav>
   </div>
   <!-- Staff sidebar removed: staff navigation is handled by the top account switcher and screen links.
