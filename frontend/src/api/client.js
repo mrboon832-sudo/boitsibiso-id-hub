@@ -11,6 +11,8 @@ async function ensureDemoToken() {
   const demo = useDemoStore();
   const token = localStorage.getItem('boitsibiso_token');
   const tokenProfile = localStorage.getItem('boitsibiso_token_profile');
+  const authMode = localStorage.getItem('boitsibiso_auth_mode');
+  if (authMode === 'real' && token && !tokenProfile) return;
   if (demo.backendReady && token && tokenProfile === demo.activeProfileKey) {
     return;
   }
@@ -54,8 +56,11 @@ export function getApiErrorMessage(error, fallback = 'The request failed.') {
 }
 
 api.interceptors.request.use(async (config) => {
-  await ensureDemoToken();
-  config.headers.Authorization = `Bearer ${localStorage.getItem('boitsibiso_token')}`;
+  const publicAuthRoute = config.url?.includes('/auth/login') || config.url?.includes('/auth/register');
+  if (!publicAuthRoute) {
+    await ensureDemoToken();
+    config.headers.Authorization = `Bearer ${localStorage.getItem('boitsibiso_token')}`;
+  }
   return config;
 });
 

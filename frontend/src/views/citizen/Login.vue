@@ -3,11 +3,36 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useDemoStore, DEMO_PROFILES } from '../../store/demo';
 import { useI18n } from '../../i18n';
+import api, { getApiErrorMessage } from '../../api/client';
 
 const demo = useDemoStore();
 const router = useRouter();
 const loading = ref(false);
+const signInLoading = ref(false);
+const signInError = ref('');
+const signInForm = ref({ nationalId: '', password: '' });
 const { t } = useI18n();
+
+async function signIn() {
+  signInError.value = '';
+  signInLoading.value = true;
+  try {
+    const { data } = await api.post('/auth/login', {
+      username: signInForm.value.nationalId.trim(),
+      password: signInForm.value.password,
+    });
+    localStorage.setItem('boitsibiso_token', data.token);
+    localStorage.setItem('boitsibiso_user', JSON.stringify(data.user));
+    localStorage.setItem('boitsibiso_auth_mode', 'real');
+    localStorage.removeItem('boitsibiso_token_profile');
+    demo.backendReady = true;
+    await router.push(data.user.role === 'citizen' ? '/citizen/dashboard' : '/staff/dashboard');
+  } catch (err) {
+    signInError.value = getApiErrorMessage(err, t('signInFailed'));
+  } finally {
+    signInLoading.value = false;
+  }
+}
 
 async function enterHub(profileKey) {
   loading.value = true;
@@ -28,6 +53,15 @@ async function enterHub(profileKey) {
       <section class="login-panel" aria-labelledby="profile-heading"><div class="panel-heading"><div class="secure-lock">⌁</div><div><p class="eyebrow">{{ t('demoAccess') }}</p><h2 id="profile-heading">{{ t('continueAs') }}</h2></div></div><p class="muted">{{ t('selectExperience') }}</p>
         <div class="profile-choice-group"><p class="choice-label">{{ t('citizenExperience') }}</p><button class="profile-choice" :disabled="loading" @click="enterHub('thabo')"><span class="choice-icon citizen-icon">◉</span><span><strong>Thabo Mokoena</strong><small>{{ t('viewPersonal') }}</small></span><span class="choice-arrow">→</span></button><button class="profile-choice" :disabled="loading" @click="enterHub('mamello')"><span class="choice-icon citizen-icon">◉</span><span><strong>Mamello Nthako</strong><small>{{ t('viewPersonal') }}</small></span><span class="choice-arrow">→</span></button></div>
         <div class="profile-choice-group"><p class="choice-label">{{ t('publicTeam') }}</p><button class="profile-choice" :disabled="loading" @click="enterHub('homeAffairs')"><span class="choice-icon staff-icon">▦</span><span><strong>{{ t('homeAffairs') }} team</strong><small>{{ t('manageIdentity') }}</small></span><span class="choice-arrow">→</span></button></div>
+        <form @submit.prevent="signIn">
+          <div class="field"><label for="login-national-id">{{ t('nationalIdLabel') }}</label><input id="login-national-id" v-model.trim="signInForm.nationalId" inputmode="numeric" autocomplete="username" required /></div>
+          <div class="field"><label for="login-password">{{ t('password') }}</label><input id="login-password" v-model="signInForm.password" type="password" autocomplete="current-password" required /></div>
+          <div class="alert error" role="alert" v-if="signInError">{{ signInError }}</div>
+          <button class="btn block" type="submit" :disabled="signInLoading">{{ signInLoading ? t('signingIn') : t('signIn') }}</button>
+        </form>
+        <p class="muted mt-1">{{ t('newCitizen') }} <router-link to="/register">{{ t('register') }}</router-link></p>
+        <hr />
+        <p class="muted">{{ t('demoAccess') }}</p>
         <router-link class="ussd-link" to="/ussd">{{ t('basicPhone') }}</router-link>
       </section>
     </main>

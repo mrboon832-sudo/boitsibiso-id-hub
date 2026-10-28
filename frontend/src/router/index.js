@@ -19,6 +19,7 @@ const routes = [
   { path: '/staff/passport-review', name: 'staff-passport-review', component: () => import('../views/staff/PassportReview.vue') },
 
   { path: '/login', name: 'login', component: () => import('../views/citizen/Login.vue') },
+  { path: '/register', name: 'register', component: () => import('../views/citizen/Register.vue') },
   { path: '/:pathMatch(.*)*', redirect: '/' },
 ];
 

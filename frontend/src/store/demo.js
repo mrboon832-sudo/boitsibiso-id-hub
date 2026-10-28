@@ -85,6 +85,7 @@ export const useDemoStore = defineStore('demo', {
       localStorage.removeItem('boitsibiso_token');
       localStorage.removeItem('boitsibiso_user');
       localStorage.removeItem('boitsibiso_token_profile');
+      localStorage.setItem('boitsibiso_auth_mode', 'demo');
       localStorage.setItem('boitsibiso_demo_profile', this.activeProfileKey);
     },
   },

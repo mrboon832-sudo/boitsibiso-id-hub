@@ -19,6 +19,7 @@ export const useAuthStore = defineStore('auth', {
       this.user = data.user;
       localStorage.setItem('boitsibiso_token', data.token);
       localStorage.setItem('boitsibiso_user', JSON.stringify(data.user));
+      localStorage.setItem('boitsibiso_auth_mode', 'real');
       return data.user;
     },
     logout() {
@@ -26,6 +27,7 @@ export const useAuthStore = defineStore('auth', {
       this.user = null;
       localStorage.removeItem('boitsibiso_token');
       localStorage.removeItem('boitsibiso_user');
+      localStorage.removeItem('boitsibiso_auth_mode');
     },
     async updatePreferences(prefs) {
       const { data } = await api.put('/auth/preferences', prefs);
