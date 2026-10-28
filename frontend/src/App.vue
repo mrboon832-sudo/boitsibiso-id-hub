@@ -14,7 +14,6 @@ const isPublicRoute = computed(() => route.path === '/' || route.path === '/logi
 </script>
 
 <template>
-  <a href="#main" class="skip-link">{{ t('skipToContent') }}</a>
   <div class="sr-only" aria-live="polite" aria-atomic="true">{{ accessibility.liveMessage }}</div>
   <AccessibilityBar />
   <div class="topbar" v-if="!isPublicRoute && route.path !== '/ussd'">

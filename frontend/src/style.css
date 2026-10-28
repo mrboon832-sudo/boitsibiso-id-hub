@@ -449,14 +449,6 @@ table.data-table th, table.data-table td {
 }
 table.data-table th { color: var(--color-text-muted); font-weight: 600; }
 
-.skip-link:focus {
-  position: fixed;
-  top: 0; left: 0;
-  background: #fff;
-  padding: 0.5rem 1rem;
-  z-index: 1000;
-}
-
 .accessibility-bar {
   position: fixed;
   top: 0.65rem;
