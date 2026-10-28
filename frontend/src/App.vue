@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router';
 import { useDemoStore } from './store/demo';
 import { useI18n } from './i18n';
 import { useAccessibilityStore } from './store/accessibility';
+import AccessibilityBar from './components/AccessibilityBar.vue';
 
 const demo = useDemoStore();
 const { t } = useI18n();
@@ -15,6 +16,7 @@ const isPublicRoute = computed(() => route.path === '/' || route.path === '/logi
 <template>
   <a href="#main" class="skip-link">Skip to content</a>
   <div class="sr-only" aria-live="polite" aria-atomic="true">{{ accessibility.liveMessage }}</div>
+  <AccessibilityBar />
   <div class="topbar" v-if="!isPublicRoute && route.path !== '/ussd'">
     <router-link class="brand" to="/">
       <img class="app-brand-logo" src="/boitsibiso-logo.png" alt="" />

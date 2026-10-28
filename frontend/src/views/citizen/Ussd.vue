@@ -65,7 +65,7 @@ async function call() {
   }
   loading.value = true;
   try {
-    const { data } = await api.post('/ussd/start');
+    const { data } = await api.post('/ussd/start', { language: accessibility.language });
     sessionId.value = data.sessionId;
     ended.value = false;
     history.value = [];

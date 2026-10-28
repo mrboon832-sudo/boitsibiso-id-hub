@@ -11,6 +11,9 @@ const messages = {
     ussdTitle: 'Boitsibiso National ID Hub', dialHint: 'Dial *330# and press Call to open the USSD menu',
     call: 'CALL', clear: 'CLEAR', session: 'SESSION', ready: 'READY', enterId: 'Enter your National ID number:',
     enterPin: 'Enter your PIN:', backHome: 'Back to demo home', endCall: 'END CALL', hangUp: 'HANG UP',
+    quickAccessibility: 'Accessibility', largeTextShort: 'Large text', contrastShort: 'Contrast', allSettings: 'All settings',
+    largeTextOn: 'Large text on', largeTextOff: 'Large text off', contrastOn: 'High contrast on', contrastOff: 'High contrast off',
+    languageChanged: 'Language changed',
   },
   st: {
     navCitizen: 'Moahi', navStaff: 'Basebetsi', navUssd: 'Mohala / USSD', demoAccount: 'Akhaonto ea teko',
@@ -22,6 +25,9 @@ const messages = {
     ussdTitle: 'Boitsibiso National ID Hub', dialHint: 'Tobetsa *330# ebe u tobetsa Call ho bula lenane la USSD',
     call: 'LETSATSI', clear: 'HLAKOLA', session: 'TŠEBELETSO', ready: 'E lokile', enterId: 'Kenya nomoro ea National ID:',
     enterPin: 'Kenya PIN ea hau:', backHome: 'Khutlela leqepheng la pele', endCall: 'KOALA', hangUp: 'KOALA MOHALA',
+    quickAccessibility: 'Phihlello', largeTextShort: 'Mongolo o moholo', contrastShort: 'Phapang', allSettings: 'Litlhophiso tsohle',
+    largeTextOn: 'Mongolo o moholo o buletsoe', largeTextOff: 'Mongolo o moholo o koetsoe', contrastOn: 'Phapang e phahameng e buletsoe', contrastOff: 'Phapang e phahameng e koetsoe',
+    languageChanged: 'Puo e fetotsoe',
   },
 };
 

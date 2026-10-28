@@ -12,9 +12,9 @@ const router = express.Router();
 const sessions = new Map();
 const SESSION_TTL_MS = 5 * 60 * 1000;
 
-function newSession() {
+function newSession(language = 'en') {
   const id = uuidv4();
-  sessions.set(id, { step: 'ENTER_ID', createdAt: Date.now() });
+  sessions.set(id, { step: 'ENTER_ID', language: language === 'st' ? 'st' : 'en', createdAt: Date.now() });
   return id;
 }
 
@@ -35,13 +35,23 @@ const SERVICE_MENU = {
   5: { serviceType: 'death_registration', label: 'Register a death' },
 };
 
-function mainMenuText(fullName) {
-  return `CON Welcome, ${fullName}\n1. My applications\n2. Request a service\n3. My data-sharing log\n0. Exit`;
+function mainMenuText(fullName, language = 'en') {
+  if (language === 'st') {
+    return 'CON Rea u amohelehile, ' + fullName + '\n1. Likopo tsa ka\n2. Kopa tšebeletso\n3. Tlaleho ea data ea ka\n4. Fetola puo\n0. Tsoa';
+  }
+  return 'CON Welcome, ' + fullName + '\n1. My applications\n2. Request a service\n3. My data-sharing log\n4. Change language\n0. Exit';
+}
+
+function serviceMenuText(language = 'en') {
+  if (language === 'st') {
+    return 'CON Khetha tšebeletso:\n1. Nchafatsa ID\n2. Nchafatsa laesense\n3. Kopo ea penshene\n4. Kopo ea phasepoto\n5. Ngolisa lefu';
+  }
+  return 'CON Choose a service:\n1. ID renewal\n2. License renewal\n3. Pension claim\n4. Passport application\n5. Register a death';
 }
 
 // POST /api/ussd/start - dial the USSD code, get session id + first screen
 router.post('/start', (req, res) => {
-  const id = newSession();
+  const id = newSession(req.body?.language);
   res.json({
     sessionId: id,
     text: 'CON Boitsibiso National ID Hub\nEnter your National ID number:',
@@ -83,7 +93,7 @@ router.post('/input', asyncHandler(async (req, res) => {
       nationalId: user.national_id,
       details: 'Logged in via USSD',
     });
-    return res.json({ sessionId, text: mainMenuText(user.full_name) });
+    return res.json({ sessionId, text: mainMenuText(user.full_name, session.language) });
   }
 
   if (session.step === 'MAIN_MENU') {
@@ -101,8 +111,12 @@ router.post('/input', asyncHandler(async (req, res) => {
       session.step = 'REQUEST_SERVICE';
       return res.json({
         sessionId,
-        text: 'CON Choose a service:\n1. ID renewal\n2. License renewal\n3. Pension claim\n4. Passport application\n5. Register a death',
+        text: serviceMenuText(session.language),
       });
+    }
+    if (input === '4') {
+      session.step = 'LANGUAGE';
+      return res.json({ sessionId, text: 'CON Choose language / Khetha puo:\n1. English\n2. Sesotho' });
     }
     if (input === '3') {
       const log = await db.all('SELECT * FROM audit_log WHERE national_id = ? ORDER BY timestamp DESC LIMIT 5', [session.nationalId]);
@@ -116,13 +130,21 @@ router.post('/input', asyncHandler(async (req, res) => {
       sessions.delete(sessionId);
       return res.json({ sessionId, text: 'END Thank you for using Boitsibiso.', ended: true });
     }
-    return res.json({ sessionId, text: mainMenuText(session.user.full_name) });
+    return res.json({ sessionId, text: mainMenuText(session.user.full_name, session.language) });
+  }
+
+  if (session.step === 'LANGUAGE') {
+    if (input === '1') session.language = 'en';
+    else if (input === '2') session.language = 'st';
+    else return res.json({ sessionId, text: 'CON Choose 1 for English or 2 for Sesotho.\n1. English\n2. Sesotho' });
+    session.step = 'MAIN_MENU';
+    return res.json({ sessionId, text: mainMenuText(session.user.full_name, session.language) });
   }
 
   if (session.step === 'REQUEST_SERVICE') {
     if (input === '0') {
       session.step = 'MAIN_MENU';
-      return res.json({ sessionId, text: mainMenuText(session.user.full_name) });
+      return res.json({ sessionId, text: mainMenuText(session.user.full_name, session.language) });
     }
     const choice = SERVICE_MENU[input];
     if (!choice) {
