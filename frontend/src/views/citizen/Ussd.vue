@@ -173,7 +173,7 @@ const dialerKeys = [
         </form>
         <div class="phone-keypad session-keypad">
           <template v-if="!ended">
-            <button v-for="number in [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]" :key="number" class="phone-key" type="button" @click="announceAndSend(String(number))" :aria-label="`${t('keyPressed')}: ${number}`">{{ number }}</button>
+            <button v-for="number in [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]" :key="number" class="phone-key" :class="{ zero: number === 0 }" type="button" @click="announceAndSend(String(number))" :aria-label="`${t('keyPressed')}: ${number}`">{{ number }}</button>
             <button class="phone-key proceed" type="button" @click="send()" :disabled="loading">{{ loading ? t('requesting') : t('proceed') }}</button>
           </template>
           <button class="phone-key end" type="button" @click="endCall">{{ ended ? t('hangUp') : t('endCall') }}</button>
