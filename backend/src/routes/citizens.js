@@ -40,6 +40,33 @@ router.get('/me', requireAuth, requireRole('citizen'), asyncHandler(async (req, 
 }));
 
 // GET /api/citizens/:nationalId - staff lookup (any department may view core identity data)
+router.get('/:nationalId/documents', requireAuth, requireRole(
+  'home_affairs', 'traffic', 'pensions', 'police', 'passport', 'finance', 'admin'
+), asyncHandler(async (req, res) => {
+  const documents = await db.all(`
+    SELECT id, national_id, document_type, document_number, status, issued_at, expires_at, issuing_department
+    FROM citizen_documents WHERE national_id = ? ORDER BY document_type
+  `, [req.params.nationalId]);
+  await writeAudit({
+    actorUser: req.user.username,
+    actorName: req.user.fullName,
+    actorRole: req.user.role,
+    action: 'CITIZEN_DOCUMENTS_VIEWED',
+    nationalId: req.params.nationalId,
+    department: req.user.department,
+  });
+  res.json({ documents: documents.map((document) => ({
+    id: document.id,
+    nationalId: document.national_id,
+    documentType: document.document_type,
+    documentNumber: document.document_number,
+    status: document.status,
+    issuedAt: document.issued_at,
+    expiresAt: document.expires_at,
+    issuingDepartment: document.issuing_department,
+  })) });
+}));
+
 router.get('/:nationalId', requireAuth, requireRole(
   'home_affairs', 'traffic', 'pensions', 'police', 'passport', 'finance', 'admin'
 ), asyncHandler(async (req, res) => {

@@ -13,6 +13,10 @@ router.post('/', requireAuth, requireRole('police'), asyncHandler(async (req, re
   if (!nationalId || !flagType) {
     return res.status(400).json({ error: 'nationalId and flagType are required.' });
   }
+  const existing = await db.get('SELECT id FROM police_flags WHERE national_id = ? AND is_active = 1', [nationalId]);
+  if (existing) {
+    return res.status(409).json({ error: 'This citizen already has an active Police flag. Review or close it before adding another.' });
+  }
   const id = uuidv4();
   await db.run(`
     INSERT INTO police_flags (id, national_id, flag_type, severity, notes, visible_flag_only, created_by, created_at, is_active)
@@ -48,6 +52,11 @@ router.get('/requests/list', requireAuth, requireRole('police', 'passport', 'tra
 router.post('/requests', requireAuth, requireRole('passport', 'traffic', 'finance'), asyncHandler(async (req, res) => {
   const { nationalId } = req.body || {};
   if (!nationalId) return res.status(400).json({ error: 'nationalId is required.' });
+  const existing = await db.get(
+    'SELECT id FROM flag_requests WHERE requesting_department = ? AND national_id = ? AND status = ?',
+    [req.user.department, nationalId, 'pending'],
+  );
+  if (existing) return res.status(409).json({ error: 'A Police flag check is already pending for this citizen.' });
   const id = uuidv4();
   await db.run(`
     INSERT INTO flag_requests (id, requesting_department, requesting_user, national_id, status, requested_at)
@@ -69,10 +78,13 @@ router.post('/requests', requireAuth, requireRole('passport', 'traffic', 'financ
 
 router.put('/requests/:id', requireAuth, requireRole('police', 'admin'), asyncHandler(async (req, res) => {
   const { status } = req.body || {};
+  if (!['approved', 'denied'].includes(status)) {
+    return res.status(400).json({ error: 'Status must be approved or denied.' });
+  }
   const fr = await db.get('SELECT * FROM flag_requests WHERE id = ?', [req.params.id]);
   if (!fr) return res.status(404).json({ error: 'Flag request not found.' });
 
-  await db.run(`UPDATE flag_requests SET status = ?, responded_by = ?, responded_at = NOW() WHERE id = ?`, [status || 'approved', req.user.username, req.params.id]);
+  await db.run(`UPDATE flag_requests SET status = ?, responded_by = ?, responded_at = NOW() WHERE id = ?`, [status, req.user.username, req.params.id]);
 
   await writeAudit({
     actorUser: req.user.username,

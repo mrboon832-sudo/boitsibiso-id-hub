@@ -43,6 +43,7 @@ function localizeScreen(text) {
 function pressDialerKey(key) {
   dialError.value = '';
   dialedNumber.value += key;
+  accessibility.announce(`${t('keyPressed')}: ${key}`);
 }
 
 function backspaceDialer() {
@@ -53,6 +54,11 @@ function backspaceDialer() {
 function clearDialer() {
   dialedNumber.value = '';
   dialError.value = '';
+}
+
+function announceAndSend(value) {
+  accessibility.announce(`${t('keyPressed')}: ${value}`);
+  send(value);
 }
 
 async function call() {
@@ -137,6 +143,7 @@ const dialerKeys = [
             class="phone-key dial-digit"
             type="button"
             @click="pressDialerKey(digit)"
+            :aria-label="`${t('keyPressed')}: ${digit}`"
           >
             <span class="digit">{{ digit }}</span>
             <span class="letters" v-if="letters">{{ letters }}</span>
@@ -166,7 +173,7 @@ const dialerKeys = [
         </form>
         <div class="phone-keypad">
           <template v-if="!ended">
-            <button v-for="number in [1, 2, 3, 4, 5, 0]" :key="number" class="phone-key" type="button" @click="send(String(number))">{{ number }}</button>
+            <button v-for="number in [1, 2, 3, 4, 5, 0]" :key="number" class="phone-key" type="button" @click="announceAndSend(String(number))" :aria-label="`${t('keyPressed')}: ${number}`">{{ number }}</button>
           </template>
           <button class="phone-key end" type="button" @click="endCall">{{ ended ? t('hangUp') : t('endCall') }}</button>
         </div>

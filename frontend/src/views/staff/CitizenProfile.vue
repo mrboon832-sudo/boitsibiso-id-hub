@@ -10,6 +10,7 @@ const demo = useDemoStore();
 const { t } = useI18n();
 const citizen = ref(null);
 const accessLog = ref([]);
+const documents = ref([]);
 const loading = ref(true);
 const saving = ref(false);
 const error = ref('');
@@ -21,12 +22,14 @@ async function load() {
   loading.value = true;
   error.value = '';
   try {
-    const [citizenRes, logRes] = await Promise.all([
+    const [citizenRes, logRes, documentsRes] = await Promise.all([
       api.get(`/citizens/${route.params.nationalId}`),
       api.get('/audit-log', { params: { nationalId: route.params.nationalId } }),
+      api.get(`/citizens/${route.params.nationalId}/documents`),
     ]);
     citizen.value = citizenRes.data.citizen;
     accessLog.value = logRes.data.entries;
+    documents.value = documentsRes.data.documents;
     form.value = {
       address: citizen.value.address,
       district: citizen.value.district,
@@ -109,6 +112,15 @@ async function save() {
           <div v-for="e in accessLog" :key="e.id" class="log-entry">
             <span class="log-who">{{ e.actorName }} ({{ (e.department || 'system').replace('_', ' ') }})</span>
             <span class="log-when">{{ e.action.replace(/_/g, ' ').toLowerCase() }} · {{ e.timestamp }}</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Existing documents</h2>
+          <p class="muted" v-if="!documents.length">No documents recorded.</p>
+          <div v-for="document in documents" :key="document.id" class="log-entry">
+            <span class="log-who">{{ document.documentType.replace(/_/g, ' ') }} — {{ document.documentNumber }}</span>
+            <span class="log-when">{{ document.status }} · {{ document.issuingDepartment.replace('_', ' ') }}</span>
           </div>
         </div>
       </div>

@@ -10,4 +10,5 @@ module.exports = {
   waitForConnections: true,
   connectionLimit: 10,
   charset: 'utf8mb4',
+  timezone: '+02:00',
 };

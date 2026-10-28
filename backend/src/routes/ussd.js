@@ -28,11 +28,12 @@ function getSession(id) {
 }
 
 const SERVICE_MENU = {
-  1: { serviceType: 'id_renewal', label: 'National ID renewal' },
-  2: { serviceType: 'license_renewal', label: "Driver's license renewal" },
-  3: { serviceType: 'pension_claim', label: 'Pension claim' },
-  4: { serviceType: 'passport_application', label: 'Passport application' },
-  5: { serviceType: 'death_registration', label: 'Register a death' },
+  1: { serviceType: 'id_application', label: 'National ID application' },
+  2: { serviceType: 'birth_certificate', label: 'Birth certificate' },
+  3: { serviceType: 'license_renewal', label: "Driver's license renewal" },
+  4: { serviceType: 'pension_claim', label: 'Pension claim' },
+  5: { serviceType: 'passport_application', label: 'Passport application' },
+  6: { serviceType: 'death_registration', label: 'Register a death' },
 };
 
 function mainMenuText(fullName, language = 'en') {
@@ -44,9 +45,9 @@ function mainMenuText(fullName, language = 'en') {
 
 function serviceMenuText(language = 'en') {
   if (language === 'st') {
-    return 'CON Khetha tšebeletso:\n1. Nchafatsa ID\n2. Nchafatsa laesense\n3. Kopo ea penshene\n4. Kopo ea phasepoto\n5. Ngolisa lefu';
+    return 'CON Khetha tšebeletso:\n1. Kopo ea National ID\n2. Setifikeiti sa tsoalo\n3. Nchafatsa laesense\n4. Kopo ea penshene\n5. Kopo ea phasepoto\n6. Ngolisa lefu';
   }
-  return 'CON Choose a service:\n1. ID renewal\n2. License renewal\n3. Pension claim\n4. Passport application\n5. Register a death';
+  return 'CON Choose a service:\n1. National ID application\n2. Birth certificate\n3. License renewal\n4. Pension claim\n5. Passport application\n6. Register a death';
 }
 
 // POST /api/ussd/start - dial the USSD code, get session id + first screen
@@ -150,10 +151,15 @@ router.post('/input', asyncHandler(async (req, res) => {
     if (!choice) {
       return res.json({ sessionId, text: 'END Invalid option. Please dial in again.', ended: true });
     }
-    const deptMap = { id_renewal: 'home_affairs', death_registration: 'home_affairs', license_renewal: 'traffic', pension_claim: 'pensions', passport_application: 'passport' };
+    if (choice.serviceType === 'id_application') {
+      session.pendingService = choice;
+      session.step = 'ID_APPLICATION_TYPE';
+      return res.json({ sessionId, text: 'CON ID application type:\n1. First-time applicant\n2. Renewal' });
+    }
+    const deptMap = { birth_certificate: 'home_affairs', death_registration: 'home_affairs', license_renewal: 'traffic', pension_claim: 'pensions', passport_application: 'passport' };
     await db.run(`
-      INSERT INTO applications (id, national_id, service_type, department, status, channel, notes, submitted_at, updated_at)
-      VALUES (?, ?, ?, ?, 'pending', 'ussd', NULL, NOW(), NOW())
+      INSERT INTO applications (id, national_id, service_type, department, status, channel, application_variant, notes, submitted_at, updated_at)
+      VALUES (?, ?, ?, ?, 'pending', 'ussd', NULL, NULL, NOW(), NOW())
     `, [uuidv4(), session.nationalId, choice.serviceType, deptMap[choice.serviceType]]);
 
     await writeAudit({
@@ -168,6 +174,29 @@ router.post('/input', asyncHandler(async (req, res) => {
 
     sessions.delete(sessionId);
     return res.json({ sessionId, text: `END Your request for "${choice.label}" was submitted. You will be notified of progress.`, ended: true });
+  }
+
+  if (session.step === 'ID_APPLICATION_TYPE') {
+    if (!['1', '2'].includes(input)) {
+      return res.json({ sessionId, text: 'CON Choose 1 for first-time applicant or 2 for renewal.' });
+    }
+    const applicationVariant = input === '1' ? 'first_time' : 'renewal';
+    const choice = session.pendingService;
+    await db.run(`
+      INSERT INTO applications (id, national_id, service_type, department, status, channel, application_variant, notes, submitted_at, updated_at)
+      VALUES (?, ?, ?, 'home_affairs', 'pending', 'ussd', ?, NULL, NOW(), NOW())
+    `, [uuidv4(), session.nationalId, choice.serviceType, applicationVariant]);
+    await writeAudit({
+      actorUser: session.user.username,
+      actorName: session.user.full_name,
+      actorRole: 'citizen',
+      action: 'SERVICE_REQUEST_SUBMITTED',
+      nationalId: session.nationalId,
+      department: 'home_affairs',
+      details: { serviceType: choice.serviceType, applicationVariant, channel: 'ussd' },
+    });
+    sessions.delete(sessionId);
+    return res.json({ sessionId, text: `END Your National ID application was submitted as a ${applicationVariant.replace('_', '-') } applicant.`, ended: true });
   }
 
   return res.json({ sessionId, text: 'END Session error. Please dial in again.', ended: true });

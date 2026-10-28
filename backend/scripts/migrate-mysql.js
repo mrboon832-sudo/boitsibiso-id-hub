@@ -48,10 +48,24 @@ const schema = [
     department VARCHAR(30) NOT NULL,
     status VARCHAR(40) NOT NULL DEFAULT 'pending',
     channel VARCHAR(30) NOT NULL DEFAULT 'web',
+    application_variant VARCHAR(30) NULL,
     notes TEXT NULL,
     submitted_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_applications_citizen FOREIGN KEY (national_id) REFERENCES citizens (national_id) ON DELETE CASCADE
+  ) ENGINE=InnoDB`,
+  `CREATE TABLE IF NOT EXISTS citizen_documents (
+    id CHAR(36) PRIMARY KEY,
+    national_id VARCHAR(20) NOT NULL,
+    document_type VARCHAR(30) NOT NULL,
+    document_number VARCHAR(80) NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'valid',
+    issued_at DATE NULL,
+    expires_at DATE NULL,
+    issuing_department VARCHAR(30) NOT NULL DEFAULT 'home_affairs',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_documents_citizen FOREIGN KEY (national_id) REFERENCES citizens (national_id) ON DELETE CASCADE,
+    INDEX idx_documents_citizen_type (national_id, document_type)
   ) ENGINE=InnoDB`,
   `CREATE TABLE IF NOT EXISTS verification_requests (
     id CHAR(36) PRIMARY KEY,
@@ -118,6 +132,11 @@ async function main() {
   const connection = await mysql.createConnection(dbConfig);
   try {
     for (const statement of schema) await connection.execute(statement);
+    try {
+      await connection.execute('ALTER TABLE applications ADD COLUMN application_variant VARCHAR(30) NULL');
+    } catch (error) {
+      if (!/duplicate column/i.test(error.message)) throw error;
+    }
     console.log(`Migrated MySQL schema in database '${dbConfig.database}'.`);
   } finally {
     await connection.end();

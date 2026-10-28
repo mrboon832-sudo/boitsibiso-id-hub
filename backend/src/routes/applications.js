@@ -15,6 +15,7 @@ function toView(a) {
     department: a.department,
     status: a.status,
     channel: a.channel,
+    applicationVariant: a.application_variant,
     notes: a.notes,
     submittedAt: a.submitted_at,
     updatedAt: a.updated_at,
@@ -22,7 +23,8 @@ function toView(a) {
 }
 
 const SERVICE_DEPARTMENTS = {
-  id_renewal: 'home_affairs',
+  id_application: 'home_affairs',
+  birth_certificate: 'home_affairs',
   death_registration: 'home_affairs',
   license_renewal: 'traffic',
   vehicle_registration: 'traffic',
@@ -45,7 +47,7 @@ router.get('/', requireAuth, asyncHandler(async (req, res) => {
 
 // POST /api/applications - citizen (web/USSD) or staff-assisted request for a service
 router.post('/', requireAuth, asyncHandler(async (req, res) => {
-  const { serviceType, channel, notes, nationalId: bodyNationalId } = req.body || {};
+  const { serviceType, applicationVariant, channel, notes, nationalId: bodyNationalId } = req.body || {};
   const nationalId = req.user.role === 'citizen' ? req.user.nationalId : bodyNationalId;
   if (!serviceType || !nationalId) {
     return res.status(400).json({ error: 'serviceType and nationalId are required.' });
@@ -54,11 +56,14 @@ router.post('/', requireAuth, asyncHandler(async (req, res) => {
   if (!department) {
     return res.status(400).json({ error: 'Unknown service type.' });
   }
+  if (serviceType === 'id_application' && !['first_time', 'renewal'].includes(applicationVariant)) {
+    return res.status(400).json({ error: 'Choose whether this is a first-time ID application or a renewal.' });
+  }
   const id = uuidv4();
   await db.run(`
-    INSERT INTO applications (id, national_id, service_type, department, status, channel, notes, submitted_at, updated_at)
-    VALUES (?, ?, ?, ?, 'pending', ?, ?, NOW(), NOW())
-  `, [id, nationalId, serviceType, department, channel || 'web', notes || null]);
+    INSERT INTO applications (id, national_id, service_type, department, status, channel, application_variant, notes, submitted_at, updated_at)
+    VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, NOW(), NOW())
+  `, [id, nationalId, serviceType, department, channel || 'web', applicationVariant || null, notes || null]);
 
   await writeAudit({
     actorUser: req.user.username,
@@ -67,7 +72,7 @@ router.post('/', requireAuth, asyncHandler(async (req, res) => {
     action: 'SERVICE_REQUEST_SUBMITTED',
     nationalId,
     department,
-    details: { serviceType, channel: channel || 'web' },
+    details: { serviceType, applicationVariant, channel: channel || 'web' },
   });
 
   const created = await db.get('SELECT * FROM applications WHERE id = ?', [id]);

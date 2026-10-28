@@ -1,3 +1,4 @@
+process.env.TZ = 'Africa/Maputo'; // Central Africa Time (CAT, UTC+02:00)
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');

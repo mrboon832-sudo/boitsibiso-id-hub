@@ -178,7 +178,7 @@ async function main() {
     await connection.beginTransaction();
 
     // Reset dependent workflow data before the shared citizen identity anchor.
-    for (const table of ['audit_log', 'flag_requests', 'police_flags', 'notifications', 'verification_requests', 'applications', 'users', 'citizens']) {
+    for (const table of ['audit_log', 'flag_requests', 'police_flags', 'notifications', 'verification_requests', 'applications', 'citizen_documents', 'users', 'citizens']) {
       await connection.query(`DELETE FROM ${table}`);
     }
 
@@ -192,6 +192,14 @@ async function main() {
     const staffUsers = staff.map(([username, fullName, role, department, phone]) => [uuidv4(), username, bcrypt.hashSync(STAFF_PASSWORD, 10), role, department, null, fullName, phone, 'en', 0, 0, 1, timestamp('2025-10-01')]);
     await insertRows(connection, `INSERT INTO users (id, username, password_hash, role, department, national_id, full_name, phone, language, large_text, must_change_password, is_active, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [...citizenUsers, ...staffUsers]);
+
+    const documents = citizens.flatMap((citizen) => [
+      [uuidv4(), citizen[0], 'birth_certificate', `BC-${citizen[0]}`, 'valid', citizen[2], null, 'home_affairs'],
+      [uuidv4(), citizen[0], 'national_id', `ID-${citizen[0]}`, 'valid', citizen[2], null, 'home_affairs'],
+      [uuidv4(), citizen[0], 'drivers_license', `DL-${citizen[0]}`, 'valid', '2024-01-15', '2029-01-15', 'traffic'],
+    ]);
+    await insertRows(connection, `INSERT INTO citizen_documents (id, national_id, document_type, document_number, status, issued_at, expires_at, issuing_department)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, documents);
 
     // 2. Department service records, all linked to the identity anchor.
     await insertRows(connection, `INSERT INTO applications (id, national_id, service_type, department, status, channel, notes, submitted_at, updated_at)

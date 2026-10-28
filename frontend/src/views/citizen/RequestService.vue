@@ -5,14 +5,16 @@ import { useI18n } from '../../i18n';
 
 const { t } = useI18n();
 const SERVICES = computed(() => [
-  { value: 'id_renewal', label: t('nationalIdRenewal'), department: t('homeAffairs') },
+  { value: 'id_application', label: t('idApplication'), department: t('homeAffairs') },
+  { value: 'birth_certificate', label: t('birthCertificate'), department: t('homeAffairs') },
   { value: 'license_renewal', label: t('licenseRenewal'), department: t('traffic') },
   { value: 'pension_claim', label: t('pensionClaim'), department: t('pensions') },
   { value: 'passport_application', label: t('passportApplication'), department: t('passportServices') },
   { value: 'death_registration', label: t('deathRegistration'), department: t('homeAffairs') },
 ]);
 const serviceLabels = computed(() => ({
-  id_renewal: t('nationalIdRenewal'),
+  id_application: t('idApplication'),
+  birth_certificate: t('birthCertificate'),
   license_renewal: t('licenseRenewal'),
   pension_claim: t('pensionClaim'),
   passport_application: t('passportApplication'),
@@ -21,6 +23,7 @@ const serviceLabels = computed(() => ({
 const departmentLabels = computed(() => ({ home_affairs: t('homeAffairs'), traffic: t('traffic'), pensions: t('pensions'), passport: t('passportServices') }));
 
 const serviceType = ref('');
+const applicationVariant = ref('');
 const notes = ref('');
 const submitting = ref(false);
 const success = ref(null);
@@ -33,15 +36,21 @@ async function submit() {
     error.value = t('pleaseChoose');
     return;
   }
+  if (serviceType.value === 'id_application' && !applicationVariant.value) {
+    error.value = 'Please choose first-time applicant or renewal.';
+    return;
+  }
   submitting.value = true;
   try {
     const { data } = await api.post('/applications', {
       serviceType: serviceType.value,
+      applicationVariant: applicationVariant.value || undefined,
       channel: 'web',
       notes: notes.value || undefined,
     });
     success.value = data.application;
     serviceType.value = '';
+    applicationVariant.value = '';
     notes.value = '';
   } catch (err) {
     error.value = err.response?.data?.error || t('submitFailed');
@@ -70,6 +79,14 @@ async function submit() {
           <select id="service" v-model="serviceType">
             <option value="" disabled>{{ t('selectService') }}</option>
             <option v-for="s in SERVICES" :key="s.value" :value="s.value">{{ s.label }} — {{ s.department }}</option>
+          </select>
+        </div>
+        <div class="field" v-if="serviceType === 'id_application'">
+          <label for="id-application-type">{{ t('idApplication') }}</label>
+          <select id="id-application-type" v-model="applicationVariant">
+            <option value="" disabled>{{ t('selectService') }}</option>
+            <option value="first_time">{{ t('firstTime') }}</option>
+            <option value="renewal">{{ t('renewal') }}</option>
           </select>
         </div>
         <div class="field">
