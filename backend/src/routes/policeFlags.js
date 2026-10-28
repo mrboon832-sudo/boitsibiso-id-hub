@@ -7,43 +7,6 @@ const { asyncHandler } = require('../middleware/asyncHandler');
 
 const router = express.Router();
 
-// GET /api/police-flags/:nationalId
-// Police see the full flag. Every other department only ever learns whether a flag EXISTS
-// (restricted-disclosure principle) - never the case notes/severity.
-router.get('/:nationalId', requireAuth, requireRole(
-  'police', 'passport', 'traffic', 'home_affairs', 'pensions', 'finance', 'admin'
-), asyncHandler(async (req, res) => {
-  const { nationalId } = req.params;
-  const flag = await db.get('SELECT * FROM police_flags WHERE national_id = ? AND is_active = 1', [nationalId]);
-
-  if (!flag) return res.json({ flag: null });
-
-  if (req.user.role === 'police' || req.user.role === 'admin') {
-    return res.json({
-      flag: {
-        id: flag.id,
-        nationalId: flag.national_id,
-        flagType: flag.flag_type,
-        severity: flag.severity,
-        notes: flag.notes,
-        createdBy: flag.created_by,
-        createdAt: flag.created_at,
-      },
-    });
-  }
-
-  // Other departments: flag-only visibility, no case details.
-  await writeAudit({
-    actorUser: req.user.username,
-    actorName: req.user.fullName,
-    actorRole: req.user.role,
-    action: 'POLICE_FLAG_STATUS_CHECKED',
-    nationalId,
-    department: req.user.department,
-  });
-  res.json({ flag: { exists: true, visibleFlagOnly: true } });
-}));
-
 // POST /api/police-flags - Police adds a flag to a citizen record
 router.post('/', requireAuth, requireRole('police'), asyncHandler(async (req, res) => {
   const { nationalId, flagType, severity, notes } = req.body || {};
@@ -123,6 +86,45 @@ router.put('/requests/:id', requireAuth, requireRole('police', 'admin'), asyncHa
 
   const updated = await db.get('SELECT * FROM flag_requests WHERE id = ?', [req.params.id]);
   res.json({ request: updated });
+}));
+
+// GET /api/police-flags/:nationalId
+// Keep this parameterised route after the literal /requests/list route above.
+// Otherwise Express treats "requests" as a National ID and the queue cannot load.
+// Police see the full flag. Every other department only ever learns whether a flag EXISTS
+// (restricted-disclosure principle) - never the case notes/severity.
+router.get('/:nationalId', requireAuth, requireRole(
+  'police', 'passport', 'traffic', 'home_affairs', 'pensions', 'finance', 'admin'
+), asyncHandler(async (req, res) => {
+  const { nationalId } = req.params;
+  const flag = await db.get('SELECT * FROM police_flags WHERE national_id = ? AND is_active = 1', [nationalId]);
+
+  if (!flag) return res.json({ flag: null });
+
+  if (req.user.role === 'police' || req.user.role === 'admin') {
+    return res.json({
+      flag: {
+        id: flag.id,
+        nationalId: flag.national_id,
+        flagType: flag.flag_type,
+        severity: flag.severity,
+        notes: flag.notes,
+        createdBy: flag.created_by,
+        createdAt: flag.created_at,
+      },
+    });
+  }
+
+  // Other departments: flag-only visibility, no case details.
+  await writeAudit({
+    actorUser: req.user.username,
+    actorName: req.user.fullName,
+    actorRole: req.user.role,
+    action: 'POLICE_FLAG_STATUS_CHECKED',
+    nationalId,
+    department: req.user.department,
+  });
+  res.json({ flag: { exists: true, visibleFlagOnly: true } });
 }));
 
 module.exports = router;

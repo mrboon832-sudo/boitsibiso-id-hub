@@ -1,63 +1,33 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '../../store/auth';
+import { useDemoStore, DEMO_PROFILES } from '../../store/demo';
 
-const auth = useAuthStore();
+const demo = useDemoStore();
 const router = useRouter();
-
-const username = ref('');
-const password = ref('');
-const error = ref('');
 const loading = ref(false);
 
-async function submit() {
-  error.value = '';
+async function enterHub(profileKey) {
   loading.value = true;
-  try {
-    const user = await auth.login(username.value.trim(), password.value);
-    router.push(user.role === 'citizen' ? '/citizen/dashboard' : '/staff/dashboard');
-  } catch (err) {
-    error.value = err.response?.data?.error || 'Login failed. Please try again.';
-  } finally {
-    loading.value = false;
-  }
+  demo.setActiveProfile(profileKey);
+  await router.push(DEMO_PROFILES[profileKey].role === 'citizen' ? '/citizen/dashboard' : '/staff/dashboard');
+  loading.value = false;
 }
 </script>
 
 <template>
-  <div class="page" style="max-width: 460px;">
-    <h1>Boitsibiso National ID Hub</h1>
-    <p class="muted">One verified identity, connecting Home Affairs, Traffic, Finance, Pensions, Police and Passport Services.</p>
-
-    <div class="card mt-1">
-      <h2>Sign in</h2>
-      <div class="alert error" role="alert" v-if="error">{{ error }}</div>
-      <form @submit.prevent="submit">
-        <div class="field">
-          <label for="username">National ID / Staff username</label>
-          <input id="username" v-model="username" autocomplete="username" required />
-        </div>
-        <div class="field">
-          <label for="password">Password</label>
-          <input id="password" type="password" v-model="password" autocomplete="current-password" required />
-        </div>
-        <button class="btn block" type="submit" :disabled="loading">
-          {{ loading ? 'Signing in…' : 'Sign in' }}
-        </button>
-      </form>
-    </div>
-
-    <div class="card">
-      <h3>No smartphone? No problem.</h3>
-      <p class="muted">Citizens without web access can use the USSD simulator below — the same menu that would run on any feature phone.</p>
-      <router-link class="btn secondary block" to="/ussd">Open USSD Simulator</router-link>
-    </div>
-
-    <div class="card">
-      <h3>Demo credentials</h3>
-      <p class="muted mb-0">Citizen: National ID as both username and password (e.g. <code>195501011000</code>).<br />
-      Staff: e.g. <code>ha.officer</code>, <code>traffic.officer</code>, <code>pensions.officer</code>, <code>police.officer</code>, <code>passport.mokoena</code>, <code>finance.officer</code>, <code>admin</code> — password <code>Password123!</code></p>
-    </div>
+  <div class="public-shell login-page">
+    <header class="public-nav page-width">
+      <router-link class="public-brand" to="/"><img class="brand-logo" src="/boitsibiso-logo.png" alt="" /><span>Boitsibiso<span class="brand-subtitle">National ID Hub</span></span></router-link>
+      <router-link class="back-link" to="/">← Back to home</router-link>
+    </header>
+    <main class="login-layout page-width">
+      <section class="login-intro"><p class="eyebrow">Welcome to the demo</p><h1>Step inside the<br /><span>National ID Hub.</span></h1><p>Choose a view to explore how Boitsibiso connects citizens and public service teams. This is a guided demo—no account or password needed.</p><div class="login-assurance"><span>✓</span><div><strong>Your data is safe here</strong><small>This demo uses sample profiles and information.</small></div></div></section>
+      <section class="login-panel" aria-labelledby="profile-heading"><div class="panel-heading"><div class="secure-lock">⌁</div><div><p class="eyebrow">Demo access</p><h2 id="profile-heading">Continue as</h2></div></div><p class="muted">Select the experience you would like to see.</p>
+        <div class="profile-choice-group"><p class="choice-label">Citizen experience</p><button class="profile-choice" :disabled="loading" @click="enterHub('thabo')"><span class="choice-icon citizen-icon">◉</span><span><strong>Thabo Mokoena</strong><small>Citizen · View personal services</small></span><span class="choice-arrow">→</span></button><button class="profile-choice" :disabled="loading" @click="enterHub('mamello')"><span class="choice-icon citizen-icon">◉</span><span><strong>Mamello Nthako</strong><small>Citizen · View personal services</small></span><span class="choice-arrow">→</span></button></div>
+        <div class="profile-choice-group"><p class="choice-label">Public service team</p><button class="profile-choice" :disabled="loading" @click="enterHub('homeAffairs')"><span class="choice-icon staff-icon">▦</span><span><strong>Home Affairs team</strong><small>Staff · Manage identity services</small></span><span class="choice-arrow">→</span></button></div>
+        <router-link class="ussd-link" to="/ussd">Prefer a basic phone? Try the USSD simulator →</router-link>
+      </section>
+    </main>
   </div>
 </template>

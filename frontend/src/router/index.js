@@ -1,7 +1,8 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 
 const routes = [
-  { path: '/', name: 'demo-home', component: () => import('../views/DemoHome.vue') },
+  { path: '/', name: 'landing', component: () => import('../views/Landing.vue') },
+  { path: '/demo', name: 'demo-home', component: () => import('../views/DemoHome.vue') },
   { path: '/ussd', name: 'ussd', component: () => import('../views/citizen/Ussd.vue') },
 
   { path: '/citizen/dashboard', name: 'citizen-dashboard', component: () => import('../views/citizen/Dashboard.vue') },
@@ -17,7 +18,7 @@ const routes = [
   { path: '/staff/police-flags', name: 'staff-police-flags', component: () => import('../views/staff/PoliceFlags.vue') },
   { path: '/staff/passport-review', name: 'staff-passport-review', component: () => import('../views/staff/PassportReview.vue') },
 
-  { path: '/login', redirect: '/' },
+  { path: '/login', name: 'login', component: () => import('../views/citizen/Login.vue') },
   { path: '/:pathMatch(.*)*', redirect: '/' },
 ];
 

@@ -9,14 +9,15 @@ const demo = useDemoStore();
 const { t } = useI18n();
 const accessibility = useAccessibilityStore();
 const route = useRoute();
-const isUssdRoute = computed(() => route.path === '/ussd');
+const isPublicRoute = computed(() => route.path === '/' || route.path === '/login');
 </script>
 
 <template>
   <a href="#main" class="skip-link">Skip to content</a>
   <div class="sr-only" aria-live="polite" aria-atomic="true">{{ accessibility.liveMessage }}</div>
-  <div class="topbar" v-if="!isUssdRoute">
+  <div class="topbar" v-if="!isPublicRoute && route.path !== '/ussd'">
     <router-link class="brand" to="/">
+      <img class="app-brand-logo" src="/boitsibiso-logo.png" alt="" />
       Boitsibiso National ID Hub — Demo Screenshot Mode
     </router-link>
     <nav>
